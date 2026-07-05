@@ -5,9 +5,9 @@
 ## Features
 
 - Root / Quality / Octave / 長さを指定してコードを追加
-- 王道進行、小室進行、ii-V-I系などのプリセット
+- 王道進行、小室進行、丸サ進行、コンファメ進行、枯葉進行、カノン進行などのプリセット
 - コード帳からコードを検索・プレビュー・追加
-- Web Audio APIによるプレビュー再生
+- Web Audio APIによるコードプレビュー再生
 - ピアノ風ブラウザシンセ音源
 - Warm Pad / Sine / Triangle / Sawtooth / Square 音色
 - ループ再生
@@ -17,6 +17,29 @@
 - WAVファイルのオフラインレンダリング書き出し
 - JSON形式でプロジェクト保存・読み込み
 - Cloudflare Pages / GitHub Pagesでそのままホスト可能
+
+## Presets
+
+現在のプリセット例:
+
+- 王道
+- 小室
+- 丸サ
+- コンファメ
+- 枯葉
+- カノン
+- 王道JPOP
+- 逆循環
+- Just Two
+- Neo Soul
+- Andalusian
+- Blues
+- 暗め
+- 浮遊
+- Lo-fi
+- EDM
+
+Cloudflare Pagesでは `_worker.js` により、既存の単一HTMLを保ったままプリセットと `m7b5` コードを上書き追加します。
 
 ## Usage
 
