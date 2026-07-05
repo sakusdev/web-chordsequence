@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chord Book - Chord Sequence Studio</title>
+  <style>
+    :root{color-scheme:dark;--text:#f8fbff;--muted:#aab5ca;--accent:#7ce8ff;--accent2:#d7ff75;--border:rgba(255,255,255,.15);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(circle at 10% 10%,rgba(124,232,255,.2),transparent 28rem),radial-gradient(circle at 90% 5%,rgba(215,255,117,.14),transparent 24rem),linear-gradient(135deg,#05060b,#101522 50%,#070811)}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px}header,main{position:relative;max-width:1180px;margin:auto;padding:28px clamp(18px,4vw,52px)}h1{margin:0;font-size:clamp(2.2rem,8vw,5.8rem);letter-spacing:-.075em;line-height:.88}.lead{color:var(--muted);line-height:1.8;max-width:760px}.top{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}a,button,input,select{font:inherit}a.btn,button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.08);color:var(--text);padding:12px 14px;font-weight:900}a.btn.primary,button.primary{background:linear-gradient(135deg,rgba(124,232,255,.28),rgba(215,255,117,.2));border-color:rgba(124,232,255,.55)}input,select{width:100%;border:1px solid var(--border);border-radius:16px;background:rgba(0,0,0,.32);color:var(--text);padding:12px 13px;outline:none}.panel{background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055));border:1px solid var(--border);border-radius:30px;padding:20px;box-shadow:0 28px 100px rgba(0,0,0,.42);backdrop-filter:blur(20px)}.tools{display:grid;grid-template-columns:1fr 160px 130px;gap:12px;margin-bottom:16px}.book{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px}.card{padding:14px;border:1px solid var(--border);border-radius:20px;background:rgba(0,0,0,.24)}.card strong{display:block;font-size:1.22rem;letter-spacing:-.04em}.card small{display:block;color:var(--muted);margin-top:5px;min-height:2.6em}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:12px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(8,12,22,.88);backdrop-filter:blur(16px);opacity:0;transition:.2s}.toast.show{opacity:1}@media(max-width:700px){.tools{grid-template-columns:1fr}.book{grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Chord Book</h1>
+    <p class="lead">コード帳を別ページ化しました。検索してプレビュー、または「使う」でメイン画面に戻ってシーケンスへ追加できます。</p>
+    <div class="top"><a class="btn primary" href="index.html">← Studioへ戻る</a></div>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="tools">
+        <input id="search" placeholder="例: Cmaj7, minor, m7b5, 9..." />
+        <select id="octave"></select>
+        <select id="bars"><option value="0.5">0.5 bar</option><option value="1" selected>1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option></select>
+      </div>
+      <div id="book" class="book"></div>
+    </section>
+  </main>
+  <div id="toast" class="toast">Ready</div>
+  <script>
+    const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    const QUALITY_INFO={major:{intervals:[0,4,7],label:'',desc:'明るい基本形'},minor:{intervals:[0,3,7],label:'m',desc:'暗い基本形'},dim:{intervals:[0,3,6],label:'dim',desc:'不安定・緊張'},m7b5:{intervals:[0,3,6,10],label:'m7b5',desc:'半減七・ジャズ'},aug:{intervals:[0,4,8],label:'aug',desc:'浮遊・不思議'},sus2:{intervals:[0,2,7],label:'sus2',desc:'透明感'},sus4:{intervals:[0,5,7],label:'sus4',desc:'解決感'},maj7:{intervals:[0,4,7,11],label:'maj7',desc:'都会的・柔らかい'},m7:{intervals:[0,3,7,10],label:'m7',desc:'落ち着いた暗さ'},'7':{intervals:[0,4,7,10],label:'7',desc:'次へ進みたい'},mMaj7:{intervals:[0,3,7,11],label:'mMaj7',desc:'映画的・怪しい'},add9:{intervals:[0,4,7,14],label:'add9',desc:'爽やか'},madd9:{intervals:[0,3,7,14],label:'madd9',desc:'切ない'},'6':{intervals:[0,4,7,9],label:'6',desc:'レトロ'},m6:{intervals:[0,3,7,9],label:'m6',desc:'ジャズ感'},'9':{intervals:[0,4,7,10,14],label:'9',desc:'ファンク/ジャズ'},maj9:{intervals:[0,4,7,11,14],label:'maj9',desc:'深い浮遊感'},m9:{intervals:[0,3,7,10,14],label:'m9',desc:'lo-fi感'}};
+    const QUALITIES=Object.fromEntries(Object.entries(QUALITY_INFO).map(([k,v])=>[k,v.intervals]));
+    let audio;
+    function $(id){return document.getElementById(id)}
+    function label(c){return c.root+(QUALITY_INFO[c.quality]?.label??c.quality)}
+    function midiRoot(root,oct){return 12*(oct+1)+NOTE_NAMES.indexOf(root)}
+    function notes(c){return QUALITIES[c.quality].map(i=>midiRoot(c.root,c.octave)+i)}
+    function freq(m){return 440*Math.pow(2,(m-69)/12)}
+    function show(t){const el=$('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1400)}
+    function preview(c){audio=audio||new(window.AudioContext||window.webkitAudioContext)();const now=audio.currentTime+.02;notes(c).forEach((m,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=freq(m);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.13,now+.015+i*.005);g.gain.exponentialRampToValueAtTime(.0001,now+1.15);o.connect(g);g.connect(audio.destination);o.start(now);o.stop(now+1.2)});show('Preview: '+label(c))}
+    function useChord(c){localStorage.setItem('webseq:addChord',JSON.stringify(c));location.href='index.html?addChord=1'}
+    function render(){const q=$('search').value.trim().toLowerCase(),oct=Number($('octave').value),bars=Number($('bars').value),book=$('book');book.innerHTML='';NOTE_NAMES.forEach(root=>Object.keys(QUALITIES).forEach(quality=>{const c={root,quality,octave:oct,bars};const hay=(label(c)+' '+root+' '+quality+' '+QUALITY_INFO[quality].desc).toLowerCase();if(q&&!hay.includes(q))return;const card=document.createElement('div');card.className='card';card.innerHTML=`<strong>${label(c)}</strong><small>${QUALITY_INFO[quality].desc}</small>`;const actions=document.createElement('div');actions.className='actions';const p=document.createElement('button');p.textContent='Preview';p.onclick=()=>preview(c);const u=document.createElement('button');u.textContent='使う';u.className='primary';u.onclick=()=>useChord(c);actions.append(p,u);card.append(actions);book.append(card)}))}
+    for(let i=2;i<=6;i++)$('octave').append(new Option('Octave '+i,i));$('octave').value=4;$('search').oninput=render;$('octave').onchange=render;$('bars').onchange=render;render();
+  </script>
+</body>
+</html>
