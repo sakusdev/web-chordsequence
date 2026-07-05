@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chord Sequence Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --panel: rgba(255,255,255,.075);
+      --panel-2: rgba(255,255,255,.115);
+      --text: #f5f7fb;
+      --muted: #aeb7cc;
+      --accent: #9cecff;
+      --accent-2: #b9ff8a;
+      --danger: #ff7d97;
+      --border: rgba(255,255,255,.16);
+      --shadow: 0 24px 80px rgba(0,0,0,.35);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(156,236,255,.16), transparent 32rem),
+        radial-gradient(circle at 90% 10%, rgba(185,255,138,.13), transparent 28rem),
+        linear-gradient(135deg, #07080d, #111421 55%, #080b12);
+    }
+
+    header {
+      padding: 36px clamp(18px, 4vw, 56px) 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+    }
+
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4.7rem); letter-spacing: -.06em; line-height: .92; }
+    .lead { color: var(--muted); max-width: 720px; margin: 14px 0 0; font-size: 1.02rem; }
+    .status { color: var(--accent-2); font-weight: 700; white-space: nowrap; }
+
+    main { padding: 0 clamp(18px, 4vw, 56px) 48px; display: grid; gap: 20px; }
+    .grid { display: grid; grid-template-columns: minmax(320px, 420px) 1fr; gap: 20px; align-items: start; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .card h2 { margin: 0 0 14px; font-size: 1.08rem; letter-spacing: -.02em; }
+    label { display: grid; gap: 8px; color: var(--muted); font-size: .9rem; }
+    input, select, button {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(0,0,0,.28);
+      color: var(--text);
+      padding: 12px 13px;
+      font: inherit;
+    }
+    input[type="range"] { padding: 0; accent-color: var(--accent); }
+    button { cursor: pointer; font-weight: 800; transition: transform .12s ease, background .12s ease, border-color .12s ease; }
+    button:hover { transform: translateY(-1px); background: var(--panel-2); border-color: rgba(156,236,255,.45); }
+    button.primary { background: linear-gradient(135deg, rgba(156,236,255,.28), rgba(185,255,138,.22)); border-color: rgba(156,236,255,.55); }
+    button.danger { color: var(--danger); }
+    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .row > * { flex: 1; }
+    .small { font-size: .82rem; color: var(--muted); }
+    .chord-buttons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .chord-buttons button { padding: 10px 8px; border-radius: 14px; }
+
+    .sequence { display: grid; gap: 10px; min-height: 220px; }
+    .chord-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--border);
+    }
+    .chord-name { font-size: 1.2rem; font-weight: 900; letter-spacing: -.03em; }
+    .pill { color: var(--muted); font-size: .82rem; border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px; }
+    .active { outline: 2px solid var(--accent); background: rgba(156,236,255,.12); }
+    .transport { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .export { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .keyboard { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; height: 70px; margin-top: 16px; }
+    .key { border-radius: 0 0 10px 10px; background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.45); position: relative; }
+    .key.black { background: #111827; height: 45px; margin-inline: -12px; z-index: 2; border-color: rgba(0,0,0,.8); }
+    .key.on { background: var(--accent); box-shadow: 0 0 22px rgba(156,236,255,.55); }
+    .empty { color: var(--muted); border: 1px dashed var(--border); border-radius: 18px; padding: 28px; text-align: center; }
+
+    @media (max-width: 900px) {
+      header { display: block; }
+      .status { display: inline-block; margin-top: 16px; }
+      .grid { grid-template-columns: 1fr; }
+      .transport, .export { grid-template-columns: 1fr 1fr; }
+      .chord-item { grid-template-columns: 1fr auto auto; }
+      .chord-item .pill { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Chord Sequence<br>Studio</h1>
+      <p class="lead">ブラウザだけでコード進行を組み、Web Audioでプレビューし、MIDI / WAVとして書き出せるミニ作曲ツール。</p>
+    </div>
+    <div class="status" id="status">Ready</div>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card">
+        <h2>コードを追加</h2>
+        <div class="form-grid">
+          <label>Root
+            <select id="root"></select>
+          </label>
+          <label>Quality
+            <select id="quality"></select>
+          </label>
+          <label>Octave
+            <select id="octave"></select>
+          </label>
+          <label>Length / bars
+            <input id="bars" type="number" min="0.25" step="0.25" value="1" />
+          </label>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="primary" id="addChord">Add chord</button>
+          <button id="previewChord">Preview chord</button>
+        </div>
+        <p class="small">よく使う進行</p>
+        <div class="chord-buttons" id="presets"></div>
+      </div>
+
+      <div class="card">
+        <h2>シーケンス</h2>
+        <div class="sequence" id="sequence"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>再生・書き出し</h2>
+      <div class="form-grid">
+        <label>BPM <input id="bpm" type="number" min="30" max="240" value="100" /></label>
+        <label>Waveform
+          <select id="waveform">
+            <option>sine</option><option>triangle</option><option selected>sawtooth</option><option>square</option>
+          </select>
+        </label>
+        <label>Attack <input id="attack" type="range" min="0" max="0.4" step="0.01" value="0.03" /></label>
+        <label>Release <input id="release" type="range" min="0.02" max="1.5" step="0.01" value="0.35" /></label>
+      </div>
+      <div class="transport" style="margin-top:14px">
+        <button class="primary" id="play">Play sequence</button>
+        <button id="stop">Stop</button>
+        <button id="saveProject">Save JSON</button>
+        <button class="danger" id="clear">Clear</button>
+      </div>
+      <div class="export" style="margin-top:10px">
+        <button id="exportMidi">Export MIDI</button>
+        <button id="exportWav">Export WAV</button>
+        <label style="display:block"><input id="loadProject" type="file" accept="application/json" style="width:100%" /></label>
+      </div>
+      <div class="keyboard" id="keyboard"></div>
+    </section>
+  </main>
+
+  <script>
+    const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    const QUALITIES = {
+      'major': [0, 4, 7],
+      'minor': [0, 3, 7],
+      'dim': [0, 3, 6],
+      'aug': [0, 4, 8],
+      'sus2': [0, 2, 7],
+      'sus4': [0, 5, 7],
+      'maj7': [0, 4, 7, 11],
+      'm7': [0, 3, 7, 10],
+      '7': [0, 4, 7, 10],
+      'mMaj7': [0, 3, 7, 11],
+      'add9': [0, 4, 7, 14],
+      'madd9': [0, 3, 7, 14],
+      '6': [0, 4, 7, 9],
+      'm6': [0, 3, 7, 9],
+      '9': [0, 4, 7, 10, 14]
+    };
+    const PRESETS = [
+      ['王道', ['C major','G major','A minor','F major']],
+      ['小室', ['A minor','F major','G major','C major']],
+      ['丸サ', ['D m7','G 7','C maj7','A minor']],
+      ['暗め', ['C minor','G# major','D# major','A# major']],
+      ['浮遊', ['F maj7','G major','E m7','A minor']],
+      ['Lo-fi', ['C maj7','B 7','E minor','G 7']],
+      ['EDM', ['F major','A minor','C major','G major']],
+      ['Reset', []]
+    ];
+
+    const state = { sequence: [], audio: null, playingNodes: [], activeIndex: -1, timers: [] };
+    const $ = id => document.getElementById(id);
+
+    function init() {
+      NOTE_NAMES.forEach(n => $('root').append(new Option(n, n)));
+      Object.keys(QUALITIES).forEach(q => $('quality').append(new Option(q, q)));
+      for (let i = 2; i <= 6; i++) $('octave').append(new Option(i, i));
+      $('octave').value = 4;
+      PRESETS.forEach(([name, chords]) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        b.onclick = () => applyPreset(chords);
+        $('presets').append(b);
+      });
+      $('addChord').onclick = addChordFromForm;
+      $('previewChord').onclick = () => previewChord(currentChordFromForm());
+      $('play').onclick = playSequence;
+      $('stop').onclick = stopAll;
+      $('clear').onclick = () => { state.sequence = []; render(); };
+      $('exportMidi').onclick = exportMidi;
+      $('exportWav').onclick = exportWav;
+      $('saveProject').onclick = saveProject;
+      $('loadProject').onchange = loadProject;
+      renderKeyboard([]);
+      render();
+    }
+
+    function currentChordFromForm() {
+      return { root: $('root').value, quality: $('quality').value, octave: Number($('octave').value), bars: Number($('bars').value) || 1 };
+    }
+
+    function chordLabel(chord) {
+      const suffix = chord.quality === 'major' ? '' : chord.quality === 'minor' ? 'm' : chord.quality;
+      return `${chord.root}${suffix}`;
+    }
+
+    function midiRoot(root, octave) {
+      return 12 * (octave + 1) + NOTE_NAMES.indexOf(root);
+    }
+
+    function chordMidiNotes(chord) {
+      return QUALITIES[chord.quality].map(interval => midiRoot(chord.root, chord.octave) + interval);
+    }
+
+    function midiToFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+
+    function addChordFromForm() {
+      state.sequence.push(currentChordFromForm());
+      render();
+    }
+
+    function applyPreset(chords) {
+      if (!chords.length) { state.sequence = []; render(); return; }
+      state.sequence = chords.map(text => {
+        const [root, qualityRaw] = text.split(' ');
+        const quality = qualityRaw === 'm' ? 'minor' : qualityRaw;
+        return { root, quality, octave: 4, bars: 1 };
+      });
+      render();
+    }
+
+    function render() {
+      const seq = $('sequence');
+      seq.innerHTML = '';
+      if (!state.sequence.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'まだコードがありません。左から追加、またはプリセットを選択。';
+        seq.append(empty);
+        return;
+      }
+      state.sequence.forEach((chord, i) => {
+        const item = document.createElement('div');
+        item.className = 'chord-item' + (i === state.activeIndex ? ' active' : '');
+        item.innerHTML = `<div class="chord-name">${chordLabel(chord)}</div><div class="pill">${chord.bars} bar / octave ${chord.octave}</div>`;
+        const up = button('↑', () => move(i, -1));
+        const down = button('↓', () => move(i, 1));
+        const del = button('×', () => { state.sequence.splice(i,1); render(); });
+        item.append(up, down, del);
+        item.onclick = e => { if (e.target.tagName !== 'BUTTON') previewChord(chord); };
+        seq.append(item);
+      });
+    }
+
+    function button(text, fn) { const b = document.createElement('button'); b.textContent = text; b.onclick = fn; return b; }
+    function move(i, delta) {
+      const j = i + delta;
+      if (j < 0 || j >= state.sequence.length) return;
+      [state.sequence[i], state.sequence[j]] = [state.sequence[j], state.sequence[i]];
+      render();
+    }
+
+    function ensureAudio() {
+      if (!state.audio) state.audio = new (window.AudioContext || window.webkitAudioContext)();
+      return state.audio;
+    }
+
+    function scheduleChord(ctx, chord, start, duration, destination = ctx.destination) {
+      const attack = Number($('attack').value);
+      const release = Number($('release').value);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.18, start + Math.max(0.005, attack));
+      gain.gain.setValueAtTime(0.18, Math.max(start, start + duration - release));
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      gain.connect(destination);
+      const nodes = chordMidiNotes(chord).map(note => {
+        const osc = ctx.createOscillator();
+        osc.type = $('waveform').value;
+        osc.frequency.value = midiToFreq(note);
+        osc.connect(gain);
+        osc.start(start);
+        osc.stop(start + duration + 0.05);
+        return osc;
+      });
+      return nodes;
+    }
+
+    function previewChord(chord) {
+      const ctx = ensureAudio();
+      stopAll(false);
+      state.playingNodes.push(...scheduleChord(ctx, chord, ctx.currentTime + 0.02, 1.8));
+      renderKeyboard(chordMidiNotes(chord));
+      setStatus(`Preview: ${chordLabel(chord)}`);
+      window.setTimeout(() => renderKeyboard([]), 1900);
+    }
+
+    function playSequence() {
+      if (!state.sequence.length) return setStatus('Add chords first');
+      const ctx = ensureAudio();
+      stopAll(false);
+      const beat = 60 / Number($('bpm').value || 100);
+      let t = ctx.currentTime + 0.08;
+      state.sequence.forEach((chord, i) => {
+        const dur = chord.bars * 4 * beat;
+        state.playingNodes.push(...scheduleChord(ctx, chord, t, dur));
+        state.timers.push(setTimeout(() => { state.activeIndex = i; render(); renderKeyboard(chordMidiNotes(chord)); }, (t - ctx.currentTime) * 1000));
+        t += dur;
+      });
+      state.timers.push(setTimeout(() => { state.activeIndex = -1; render(); renderKeyboard([]); setStatus('Ready'); }, (t - ctx.currentTime) * 1000));
+      setStatus('Playing');
+    }
+
+    function stopAll(updateStatus = true) {
+      state.playingNodes.forEach(n => { try { n.stop(); } catch {} });
+      state.playingNodes = [];
+      state.timers.forEach(clearTimeout);
+      state.timers = [];
+      state.activeIndex = -1;
+      renderKeyboard([]);
+      render();
+      if (updateStatus) setStatus('Stopped');
+    }
+
+    function renderKeyboard(notes) {
+      const kb = $('keyboard');
+      kb.innerHTML = '';
+      const activePitchClasses = new Set(notes.map(n => n % 12));
+      NOTE_NAMES.forEach((name, i) => {
+        const key = document.createElement('div');
+        key.className = 'key ' + (name.includes('#') ? 'black ' : '') + (activePitchClasses.has(i) ? 'on' : '');
+        key.title = name;
+        kb.append(key);
+      });
+    }
+
+    function setStatus(text) { $('status').textContent = text; }
+
+    function exportMidi() {
+      if (!state.sequence.length) return setStatus('No chords to export');
+      const ppq = 480;
+      const bpm = Number($('bpm').value || 100);
+      const tempo = Math.round(60000000 / bpm);
+      const events = [];
+      let tick = 0;
+      state.sequence.forEach(chord => {
+        const dur = Math.round(chord.bars * 4 * ppq);
+        chordMidiNotes(chord).forEach(n => events.push({ tick, type: 'on', note: n }));
+        chordMidiNotes(chord).forEach(n => events.push({ tick: tick + dur, type: 'off', note: n }));
+        tick += dur;
+      });
+      events.sort((a,b) => a.tick - b.tick || (a.type === 'off' ? -1 : 1));
+      const track = [];
+      pushVar(track, 0); track.push(0xff, 0x51, 0x03, (tempo>>16)&255, (tempo>>8)&255, tempo&255);
+      pushVar(track, 0); track.push(0xff, 0x58, 0x04, 4, 2, 24, 8);
+      let last = 0;
+      events.forEach(e => {
+        pushVar(track, e.tick - last);
+        last = e.tick;
+        track.push(e.type === 'on' ? 0x90 : 0x80, e.note, e.type === 'on' ? 86 : 0);
+      });
+      pushVar(track, 0); track.push(0xff, 0x2f, 0x00);
+      const bytes = [...ascii('MThd'), 0,0,0,6, 0,0, 0,1, (ppq>>8)&255, ppq&255, ...ascii('MTrk'), ...u32(track.length), ...track];
+      download(new Blob([new Uint8Array(bytes)], { type: 'audio/midi' }), 'chord-sequence.mid');
+      setStatus('MIDI exported');
+    }
+
+    function pushVar(arr, value) {
+      let buffer = value & 0x7f;
+      while ((value >>= 7)) { buffer <<= 8; buffer |= ((value & 0x7f) | 0x80); }
+      while (true) { arr.push(buffer & 0xff); if (buffer & 0x80) buffer >>= 8; else break; }
+    }
+    function ascii(s) { return [...s].map(c => c.charCodeAt(0)); }
+    function u32(n) { return [(n>>>24)&255, (n>>>16)&255, (n>>>8)&255, n&255]; }
+
+    async function exportWav() {
+      if (!state.sequence.length) return setStatus('No chords to export');
+      setStatus('Rendering WAV...');
+      const bpm = Number($('bpm').value || 100);
+      const beat = 60 / bpm;
+      const duration = state.sequence.reduce((sum, c) => sum + c.bars * 4 * beat, 0) + 0.8;
+      const sampleRate = 44100;
+      const ctx = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
+      const master = ctx.createGain();
+      master.gain.value = 0.72;
+      master.connect(ctx.destination);
+      let t = 0.05;
+      state.sequence.forEach(chord => {
+        const dur = chord.bars * 4 * beat;
+        scheduleOfflineChord(ctx, chord, t, dur, master);
+        t += dur;
+      });
+      const buffer = await ctx.startRendering();
+      download(audioBufferToWav(buffer), 'chord-sequence.wav');
+      setStatus('WAV exported');
+    }
+
+    function scheduleOfflineChord(ctx, chord, start, duration, destination) {
+      const attack = Number($('attack').value);
+      const release = Number($('release').value);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.18, start + Math.max(0.005, attack));
+      gain.gain.setValueAtTime(0.18, Math.max(start, start + duration - release));
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      gain.connect(destination);
+      chordMidiNotes(chord).forEach(note => {
+        const osc = ctx.createOscillator();
+        osc.type = $('waveform').value;
+        osc.frequency.value = midiToFreq(note);
+        osc.connect(gain);
+        osc.start(start);
+        osc.stop(start + duration + 0.05);
+      });
+    }
+
+    function audioBufferToWav(buffer) {
+      const channels = buffer.numberOfChannels;
+      const length = buffer.length * channels * 2 + 44;
+      const view = new DataView(new ArrayBuffer(length));
+      let offset = 0;
+      writeString('RIFF'); view.setUint32(offset, length - 8, true); offset += 4; writeString('WAVE');
+      writeString('fmt '); view.setUint32(offset, 16, true); offset += 4; view.setUint16(offset, 1, true); offset += 2;
+      view.setUint16(offset, channels, true); offset += 2; view.setUint32(offset, buffer.sampleRate, true); offset += 4;
+      view.setUint32(offset, buffer.sampleRate * channels * 2, true); offset += 4; view.setUint16(offset, channels * 2, true); offset += 2;
+      view.setUint16(offset, 16, true); offset += 2; writeString('data'); view.setUint32(offset, length - 44, true); offset += 4;
+      for (let i = 0; i < buffer.length; i++) {
+        for (let ch = 0; ch < channels; ch++) {
+          const sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+          view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+          offset += 2;
+        }
+      }
+      function writeString(s) { for (let i=0; i<s.length; i++) view.setUint8(offset++, s.charCodeAt(i)); }
+      return new Blob([view], { type: 'audio/wav' });
+    }
+
+    function saveProject() {
+      download(new Blob([JSON.stringify({ version: 1, bpm: $('bpm').value, waveform: $('waveform').value, sequence: state.sequence }, null, 2)], { type: 'application/json' }), 'chord-sequence.json');
+    }
+
+    async function loadProject(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const data = JSON.parse(await file.text());
+      if (data.bpm) $('bpm').value = data.bpm;
+      if (data.waveform) $('waveform').value = data.waveform;
+      if (Array.isArray(data.sequence)) state.sequence = data.sequence;
+      render();
+      setStatus('Project loaded');
+    }
+
+    function download(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
