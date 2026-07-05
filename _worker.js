@@ -46,6 +46,12 @@ const REVERB_PLUS_SF2 = `          <label>Reverb <input id="reverb" type="range"
 const SF2_MICRO_NOTE = `Piano音源はサンプル未使用の軽量シンセです。複数倍音、短いアタック、指数減衰、軽いディチューンでピアノっぽくしています。`;
 const SF2_MICRO_NOTE_NEW = `Piano音源はサンプル未使用の軽量シンセです。SF2モードではローカルの.sf2を読み、サンプルヘッダから最寄り音程のPCMサンプルを再生します。`;
 
+const STYLE_END = `  </style>`;
+const HIDE_TOP_BADGES_STYLE = `
+    .top-badges { display: none !important; }
+    header { grid-template-columns: 1fr !important; gap: 0 !important; }
+  </style>`;
+
 const INIT_CALL = `    init();`;
 const SF2_PATCH = `
     // --- SF2 SoundFont support injected for Cloudflare Pages ---
@@ -186,6 +192,7 @@ export default {
 
     let html = await response.text();
     html = html
+      .replace(STYLE_END, HIDE_TOP_BADGES_STYLE)
       .replace(DIM_LINE, DIM_PLUS_HALF_DIM)
       .replace(OLD_PRESETS, NEW_PRESETS)
       .replace(INSTRUMENT_SELECT, INSTRUMENT_SELECT_SF2)
