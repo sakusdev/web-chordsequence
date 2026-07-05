@@ -12,7 +12,8 @@ export default {
     let html = await response.text();
     const scripts = [
       '<script src="/features.js?v=20260705-advanced-1"></script>',
-      '<script src="/features-extra.js?v=20260705-extra-1"></script>'
+      '<script src="/features-extra.js?v=20260705-extra-1"></script>',
+      '<script src="/features-ui.js?v=20260705-ui-1"></script>'
     ].filter(script => !html.includes(script.match(/src="([^"]+)/)?.[1] || ''));
 
     if (scripts.length) html = html.replace('</body>', `${scripts.join('\n')}\n</body>`);
