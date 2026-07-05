@@ -10,8 +10,12 @@ export default {
     if (!contentType.includes('text/html')) return response;
 
     let html = await response.text();
-    const featureScript = '<script src="/features.js?v=20260705-advanced-1"></script>';
-    if (!html.includes('/features.js')) html = html.replace('</body>', `${featureScript}\n</body>`);
+    const scripts = [
+      '<script src="/features.js?v=20260705-advanced-1"></script>',
+      '<script src="/features-extra.js?v=20260705-extra-1"></script>'
+    ].filter(script => !html.includes(script.match(/src="([^"]+)/)?.[1] || ''));
+
+    if (scripts.length) html = html.replace('</body>', `${scripts.join('\n')}\n</body>`);
 
     const headers = new Headers(response.headers);
     headers.set('content-type', 'text/html; charset=utf-8');
