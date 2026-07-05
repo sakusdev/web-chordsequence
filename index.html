@@ -5,812 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chord Sequence Studio</title>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #070810;
-      --panel: rgba(255,255,255,.078);
-      --panel-strong: rgba(255,255,255,.13);
-      --glass: rgba(9,12,22,.72);
-      --text: #f8fbff;
-      --muted: #aab5ca;
-      --soft: #d9e4ff;
-      --accent: #7ce8ff;
-      --accent-2: #d7ff75;
-      --accent-3: #c69bff;
-      --danger: #ff7d9a;
-      --border: rgba(255,255,255,.15);
-      --border-hot: rgba(124,232,255,.42);
-      --shadow: 0 28px 100px rgba(0,0,0,.42);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 9% 9%, rgba(124,232,255,.22), transparent 27rem),
-        radial-gradient(circle at 88% 6%, rgba(215,255,117,.16), transparent 24rem),
-        radial-gradient(circle at 50% 108%, rgba(198,155,255,.17), transparent 30rem),
-        linear-gradient(135deg, #05060b, #101522 50%, #070811);
-      overflow-x: hidden;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .28;
-      background-image:
-        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(circle at center, black, transparent 78%);
-    }
-
-    header {
-      position: relative;
-      padding: 38px clamp(18px, 4vw, 58px) 22px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 24px;
-      align-items: end;
-    }
-    h1 {
-      margin: 0;
-      max-width: 960px;
-      font-size: clamp(2.45rem, 7vw, 6.6rem);
-      letter-spacing: -.075em;
-      line-height: .84;
-    }
-    .lead { color: var(--muted); max-width: 760px; margin: 18px 0 0; font-size: clamp(.95rem, 2vw, 1.12rem); line-height: 1.8; }
-    .top-badges { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .status, .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 38px;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255,255,255,.075);
-      color: var(--soft);
-      font-weight: 850;
-      white-space: nowrap;
-      box-shadow: 0 12px 36px rgba(0,0,0,.18);
-    }
-    .status::before { content: "●"; color: var(--accent-2); font-size: .76rem; }
-
-    main { position: relative; padding: 0 clamp(18px, 4vw, 58px) 54px; display: grid; gap: 20px; }
-    .grid { display: grid; grid-template-columns: minmax(320px, 440px) 1fr; gap: 20px; align-items: start; }
-    .wide-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 20px; align-items: start; }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.105), rgba(255,255,255,.055));
-      border: 1px solid var(--border);
-      border-radius: 32px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(22px);
-    }
-    .card h2 { margin: 0 0 15px; font-size: 1.08rem; letter-spacing: -.025em; display: flex; align-items: center; gap: 9px; }
-    .card h2 span { color: var(--accent); }
-    label { display: grid; gap: 8px; color: var(--muted); font-size: .9rem; font-weight: 720; }
-    input, select, button {
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      background: rgba(0,0,0,.32);
-      color: var(--text);
-      padding: 12px 13px;
-      font: inherit;
-      outline: none;
-    }
-    input:focus, select:focus { border-color: var(--border-hot); box-shadow: 0 0 0 4px rgba(124,232,255,.08); }
-    input[type="range"] { padding: 0; accent-color: var(--accent); }
-    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
-    button { cursor: pointer; font-weight: 900; transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease; user-select: none; }
-    button:hover { transform: translateY(-1px); background: rgba(255,255,255,.13); border-color: var(--border-hot); box-shadow: 0 12px 30px rgba(0,0,0,.16); }
-    button.primary { background: linear-gradient(135deg, rgba(124,232,255,.28), rgba(215,255,117,.2)); border-color: rgba(124,232,255,.56); }
-    button.secondary { background: linear-gradient(135deg, rgba(198,155,255,.24), rgba(124,232,255,.12)); }
-    button.danger { color: var(--danger); }
-    button.mini { padding: 9px 10px; border-radius: 13px; font-size: .88rem; }
-    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .row > * { flex: 1; }
-    .small { font-size: .82rem; color: var(--muted); line-height: 1.65; }
-    .micro { font-size: .75rem; color: rgba(217,228,255,.78); }
-    .chord-buttons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-    .chord-buttons button { padding: 10px 8px; border-radius: 14px; }
-
-    .sequence { display: grid; gap: 10px; min-height: 236px; }
-    .chord-item {
-      display: grid;
-      grid-template-columns: auto 1fr auto auto auto auto;
-      gap: 10px;
-      align-items: center;
-      padding: 12px;
-      border-radius: 20px;
-      background: rgba(0,0,0,.28);
-      border: 1px solid var(--border);
-    }
-    .chord-index { color: var(--accent); font-size: .82rem; font-weight: 950; min-width: 30px; }
-    .chord-name { font-size: 1.28rem; font-weight: 950; letter-spacing: -.04em; }
-    .pill { color: var(--muted); font-size: .82rem; border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px; display: inline-flex; gap: 6px; align-items: center; width: fit-content; }
-    .active { outline: 2px solid var(--accent); background: rgba(124,232,255,.13); }
-
-    .transport { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    .export { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .control-strip {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-    .toggle-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 48px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: rgba(0,0,0,.24);
-      color: var(--soft);
-      font-weight: 850;
-    }
-
-    .keyboard-wrap { margin-top: 16px; border-radius: 24px; padding: 12px; background: rgba(0,0,0,.24); border: 1px solid var(--border); }
-    .keyboard { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; height: 82px; }
-    .key { border-radius: 0 0 12px 12px; background: linear-gradient(180deg, #ffffff, #cbd5e1); border: 1px solid rgba(255,255,255,.45); position: relative; box-shadow: inset 0 -8px 12px rgba(0,0,0,.13); }
-    .key.black { background: linear-gradient(180deg, #202638, #03050b); height: 52px; margin-inline: -13px; z-index: 2; border-color: rgba(0,0,0,.8); }
-    .key.on { background: var(--accent); box-shadow: 0 0 28px rgba(124,232,255,.68), inset 0 -8px 12px rgba(0,0,0,.13); }
-    .key.black.on { background: linear-gradient(180deg, var(--accent-3), #27213c); }
-    .empty { color: var(--muted); border: 1px dashed var(--border); border-radius: 22px; padding: 32px; text-align: center; background: rgba(0,0,0,.14); }
-
-    .chord-book-tools { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 12px; }
-    .chord-book { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 9px; max-height: 420px; overflow: auto; padding-right: 4px; }
-    .book-card {
-      text-align: left;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.26);
-      border: 1px solid var(--border);
-    }
-    .book-card strong { display: block; font-size: 1.1rem; letter-spacing: -.03em; }
-    .book-card small { color: var(--muted); display: block; margin-top: 4px; }
-    .book-card:hover { background: rgba(124,232,255,.11); }
-
-    .meter {
-      height: 8px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255,255,255,.11);
-      margin-top: 14px;
-    }
-    .meter > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .12s linear; }
-
-    @media (max-width: 1040px) {
-      header { grid-template-columns: 1fr; }
-      .top-badges { justify-content: flex-start; }
-      .grid, .wide-grid { grid-template-columns: 1fr; }
-      .transport, .control-strip { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 650px) {
-      .form-grid, .export, .transport, .control-strip { grid-template-columns: 1fr; }
-      .chord-buttons { grid-template-columns: 1fr 1fr; }
-      .chord-item { grid-template-columns: auto 1fr auto auto; }
-      .chord-item .pill { grid-column: 2 / -1; }
-      .hide-mobile { display: none; }
-    }
+    :root{color-scheme:dark;--bg:#070810;--text:#f8fbff;--muted:#aab5ca;--accent:#7ce8ff;--accent2:#d7ff75;--accent3:#c69bff;--danger:#ff7d9a;--border:rgba(255,255,255,.15);--hot:rgba(124,232,255,.45);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(circle at 9% 9%,rgba(124,232,255,.2),transparent 28rem),radial-gradient(circle at 88% 8%,rgba(215,255,117,.14),transparent 26rem),radial-gradient(circle at 50% 108%,rgba(198,155,255,.16),transparent 32rem),linear-gradient(135deg,#05060b,#101522 50%,#070811);overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at center,#000,transparent 78%)}
+    header{position:relative;padding:38px clamp(18px,4vw,58px) 22px;max-width:1260px;margin:auto}h1{margin:0;max-width:960px;font-size:clamp(2.45rem,7vw,6.6rem);letter-spacing:-.075em;line-height:.84}.lead{color:var(--muted);max-width:760px;margin:18px 0 0;font-size:clamp(.95rem,2vw,1.12rem);line-height:1.8}
+    main{position:relative;padding:0 clamp(18px,4vw,58px) 54px;max-width:1260px;margin:auto;display:grid;gap:20px}.grid{display:grid;grid-template-columns:minmax(310px,440px) 1fr;gap:20px;align-items:start}.wide{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:start}.card{background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055));border:1px solid var(--border);border-radius:32px;padding:22px;box-shadow:0 28px 100px rgba(0,0,0,.42);backdrop-filter:blur(22px)}.card h2{margin:0 0 15px;font-size:1.08rem;letter-spacing:-.025em;display:flex;gap:10px;align-items:center}.card h2 span{color:var(--accent)}
+    label{display:grid;gap:8px;color:var(--muted);font-size:.9rem;font-weight:780}input,select,button{border:1px solid var(--border);border-radius:17px;background:rgba(0,0,0,.32);color:var(--text);padding:12px 13px;font:inherit;outline:none}input:focus,select:focus{border-color:var(--hot);box-shadow:0 0 0 4px rgba(124,232,255,.08)}input[type=range]{padding:0;accent-color:var(--accent)}input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}input[type=file]{width:100%;font-size:.85rem}button{cursor:pointer;font-weight:900;transition:.14s}button:hover{transform:translateY(-1px);background:rgba(255,255,255,.13);border-color:var(--hot);box-shadow:0 12px 30px rgba(0,0,0,.16)}button.primary{background:linear-gradient(135deg,rgba(124,232,255,.28),rgba(215,255,117,.2));border-color:rgba(124,232,255,.56)}button.secondary{background:linear-gradient(135deg,rgba(198,155,255,.24),rgba(124,232,255,.12))}button.danger{color:var(--danger)}button.mini{padding:9px 10px;border-radius:13px;font-size:.88rem}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.small{font-size:.82rem;color:var(--muted);line-height:1.65}.micro{font-size:.75rem;color:rgba(217,228,255,.78);line-height:1.65}.presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:310px;overflow:auto;padding-right:4px}.presets button{text-align:left;padding:10px 9px;border-radius:14px}.sequence{display:grid;gap:10px;min-height:236px}.chord-item{display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:10px;align-items:center;padding:12px;border-radius:20px;background:rgba(0,0,0,.28);border:1px solid var(--border)}.active{outline:2px solid var(--accent);background:rgba(124,232,255,.13)}.idx{color:var(--accent);font-size:.82rem;font-weight:950;min-width:30px}.name{font-size:1.28rem;font-weight:950;letter-spacing:-.04em}.pill{color:var(--muted);font-size:.82rem;border:1px solid var(--border);padding:4px 8px;border-radius:999px;display:inline-flex;width:fit-content}.empty{color:var(--muted);border:1px dashed var(--border);border-radius:22px;padding:32px;text-align:center;background:rgba(0,0,0,.14)}.transport{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.export{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.control{margin-top:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:12px 14px;border:1px solid var(--border);border-radius:18px;background:rgba(0,0,0,.24);color:#d9e4ff;font-weight:850}.keyboard-wrap{margin-top:16px;border-radius:24px;padding:12px;background:rgba(0,0,0,.24);border:1px solid var(--border)}.keyboard{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;height:82px}.key{border-radius:0 0 12px 12px;background:linear-gradient(180deg,#fff,#cbd5e1);border:1px solid rgba(255,255,255,.45);position:relative;box-shadow:inset 0 -8px 12px rgba(0,0,0,.13)}.key.black{background:linear-gradient(180deg,#202638,#03050b);height:52px;margin-inline:-13px;z-index:2;border-color:rgba(0,0,0,.8)}.key.on{background:var(--accent);box-shadow:0 0 28px rgba(124,232,255,.68),inset 0 -8px 12px rgba(0,0,0,.13)}.key.black.on{background:linear-gradient(180deg,var(--accent3),#27213c)}.meter{height:8px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.11);margin-top:14px}.meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .12s linear}.book-tools{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}.book{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:9px;max-height:420px;overflow:auto;padding-right:4px}.book-card{text-align:left;padding:12px;border-radius:18px;background:rgba(0,0,0,.26);border:1px solid var(--border)}.book-card strong{display:block;font-size:1.1rem;letter-spacing:-.03em}.book-card small{color:var(--muted);display:block;margin-top:4px}.book-card:hover{background:rgba(124,232,255,.11)}
+    @media(max-width:1040px){.grid,.wide{grid-template-columns:1fr}.transport,.control{grid-template-columns:1fr 1fr}}@media(max-width:650px){.form-grid,.export,.transport,.control{grid-template-columns:1fr}.presets{grid-template-columns:1fr 1fr}.chord-item{grid-template-columns:auto 1fr auto auto}.chord-item .pill{grid-column:2/-1}}
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1>Chord Sequence<br>Studio</h1>
-      <p class="lead">コード帳から選ぶ、進行を組む、ピアノ風音源で鳴らす。ブラウザだけでMIDI / WAVまで書き出せるコード進行スケッチャー。</p>
-    </div>
-    <div class="top-badges">
-      <div class="badge">Piano Engine</div>
-      <div class="badge">Loop Ready</div>
-      <div class="status" id="status">Ready</div>
-    </div>
+    <h1>Chord Sequence<br>Studio</h1>
+    <p class="lead">コード帳から選ぶ、進行を組む、ピアノ風音源やSF2で鳴らす。ブラウザだけでMIDI / WAVまで書き出せるコード進行スケッチャー。</p>
   </header>
-
   <main>
     <section class="grid">
       <div class="card">
         <h2><span>01</span> コードを追加</h2>
         <div class="form-grid">
-          <label>Root
-            <select id="root"></select>
-          </label>
-          <label>Quality
-            <select id="quality"></select>
-          </label>
-          <label>Octave
-            <select id="octave"></select>
-          </label>
-          <label>Length / bars
-            <input id="bars" type="number" min="0.25" step="0.25" value="1" />
-          </label>
+          <label>Root<select id="root"></select></label>
+          <label>Quality<select id="quality"></select></label>
+          <label>Octave<select id="octave"></select></label>
+          <label>Length / bars<input id="bars" type="number" min="0.25" step="0.25" value="1"></label>
         </div>
-        <div class="row" style="margin-top:12px">
-          <button class="primary" id="addChord">Add chord</button>
-          <button id="previewChord">Preview</button>
-        </div>
+        <div class="row" style="margin-top:12px"><button class="primary" id="addChord">Add chord</button><button id="previewChord">Preview</button></div>
         <p class="small">よく使う進行</p>
-        <div class="chord-buttons" id="presets"></div>
+        <div class="presets" id="presets"></div>
       </div>
-
       <div class="card">
-        <h2><span>02</span> シーケンス</h2>
+        <h2><span>02</span> 進行を編集</h2>
         <div class="sequence" id="sequence"></div>
         <div class="meter"><div id="progress"></div></div>
       </div>
     </section>
-
-    <section class="wide-grid">
+    <section class="wide">
       <div class="card">
         <h2><span>03</span> 再生・書き出し</h2>
         <div class="form-grid">
-          <label>BPM <input id="bpm" type="number" min="30" max="240" value="100" /></label>
-          <label>Instrument
-            <select id="instrument">
-              <option value="piano" selected>Piano / browser synth</option>
-              <option value="warm">Warm Pad</option>
-              <option value="sine">Sine</option>
-              <option value="triangle">Triangle</option>
-              <option value="sawtooth">Sawtooth</option>
-              <option value="square">Square</option>
-            </select>
-          </label>
-          <label>Attack <input id="attack" type="range" min="0" max="0.45" step="0.01" value="0.01" /></label>
-          <label>Release <input id="release" type="range" min="0.03" max="2.4" step="0.01" value="0.82" /></label>
+          <label>BPM<input id="bpm" type="number" min="30" max="240" value="100"></label>
+          <label>Instrument<select id="instrument"><option value="piano" selected>Piano / browser synth</option><option value="sf2">SF2 SoundFont / uploaded</option><option value="warm">Warm Pad</option><option value="sine">Sine</option><option value="triangle">Triangle</option><option value="sawtooth">Sawtooth</option><option value="square">Square</option></select></label>
+          <label>Attack<input id="attack" type="range" min="0" max="0.45" step="0.01" value="0.01"></label>
+          <label>Release<input id="release" type="range" min="0.03" max="2.4" step="0.01" value="0.82"></label>
         </div>
-        <div class="control-strip">
-          <label class="toggle-line">Loop <input id="loop" type="checkbox" /></label>
-          <label>Velocity <input id="velocity" type="range" min="0.2" max="1" step="0.01" value="0.76" /></label>
-          <label>Humanize <input id="humanize" type="range" min="0" max="0.04" step="0.002" value="0.008" /></label>
-          <label>Reverb <input id="reverb" type="range" min="0" max="0.55" step="0.01" value="0.18" /></label>
+        <div class="control">
+          <label class="toggle">Loop<input id="loop" type="checkbox"></label>
+          <label>Velocity<input id="velocity" type="range" min="0.2" max="1" step="0.01" value="0.76"></label>
+          <label>Humanize<input id="humanize" type="range" min="0" max="0.04" step="0.002" value="0.008"></label>
+          <label>Reverb<input id="reverb" type="range" min="0" max="0.55" step="0.01" value="0.18"></label>
         </div>
-        <div class="transport" style="margin-top:14px">
-          <button class="primary" id="play">Play</button>
-          <button class="secondary" id="loopPlay">Loop Play</button>
-          <button id="stop">Stop</button>
-          <button id="saveProject">Save JSON</button>
-          <button class="danger" id="clear">Clear</button>
+        <div class="form-grid" style="margin-top:12px">
+          <label>SF2 File<input id="sf2File" type="file" accept=".sf2,audio/x-soundfont"></label>
+          <label>Status<input id="statusText" value="Ready" readonly></label>
         </div>
-        <div class="export" style="margin-top:10px">
-          <button id="exportMidi">Export MIDI</button>
-          <button id="exportWav">Export WAV</button>
-          <label style="display:block"><input id="loadProject" type="file" accept="application/json" style="width:100%" /></label>
-        </div>
+        <div class="transport" style="margin-top:14px"><button class="primary" id="play">Play</button><button class="secondary" id="loopPlay">Loop Play</button><button id="stop">Stop</button><button id="saveProject">Save JSON</button><button class="danger" id="clear">Clear</button></div>
+        <div class="export" style="margin-top:10px"><button id="exportMidi">Export MIDI</button><button id="exportWav">Export WAV</button><label><input id="loadProject" type="file" accept="application/json"></label></div>
         <div class="keyboard-wrap"><div class="keyboard" id="keyboard"></div></div>
-        <p class="micro">Piano音源はサンプル未使用の軽量シンセです。複数倍音、短いアタック、指数減衰、軽いディチューンでピアノっぽくしています。</p>
+        <p class="micro">SF2はローカルのファイルをブラウザ内だけで読み込みます。サーバーにはアップロードされません。現在は16bit PCMの一般的なSoundFontを簡易サンプラーとして再生します。</p>
       </div>
-
       <div class="card">
         <h2><span>04</span> コード帳</h2>
-        <div class="chord-book-tools">
-          <input id="bookSearch" placeholder="例: Cmaj7, minor, 7..." />
-          <button id="bookPreviewMode" class="mini">Preview</button>
-        </div>
-        <p class="small">クリックでプレビュー、Alt/Option + クリックで即追加。PreviewボタンをAddに切り替えると通常クリックで追加。</p>
-        <div class="chord-book" id="chordBook"></div>
+        <div class="book-tools"><input id="bookSearch" placeholder="例: Cmaj7, minor, m7b5, 9..."><button id="bookMode" class="mini">Preview</button></div>
+        <p class="small">クリックでプレビュー。Addモード、またはAlt/Option + クリックでシーケンスへ追加。</p>
+        <div class="book" id="chordBook"></div>
       </div>
     </section>
   </main>
-
   <script>
-    const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-    const QUALITY_INFO = {
-      'major': { intervals: [0, 4, 7], label: '', desc: '明るい基本形' },
-      'minor': { intervals: [0, 3, 7], label: 'm', desc: '暗い基本形' },
-      'dim': { intervals: [0, 3, 6], label: 'dim', desc: '不安定・緊張' },
-      'aug': { intervals: [0, 4, 8], label: 'aug', desc: '浮遊・不思議' },
-      'sus2': { intervals: [0, 2, 7], label: 'sus2', desc: '透明感' },
-      'sus4': { intervals: [0, 5, 7], label: 'sus4', desc: '解決感' },
-      'maj7': { intervals: [0, 4, 7, 11], label: 'maj7', desc: '都会的・柔らかい' },
-      'm7': { intervals: [0, 3, 7, 10], label: 'm7', desc: '落ち着いた暗さ' },
-      '7': { intervals: [0, 4, 7, 10], label: '7', desc: '次へ進みたい' },
-      'mMaj7': { intervals: [0, 3, 7, 11], label: 'mMaj7', desc: '映画的・怪しい' },
-      'add9': { intervals: [0, 4, 7, 14], label: 'add9', desc: '爽やか' },
-      'madd9': { intervals: [0, 3, 7, 14], label: 'madd9', desc: '切ない' },
-      '6': { intervals: [0, 4, 7, 9], label: '6', desc: 'レトロ' },
-      'm6': { intervals: [0, 3, 7, 9], label: 'm6', desc: 'ジャズ感' },
-      '9': { intervals: [0, 4, 7, 10, 14], label: '9', desc: 'ファンク/ジャズ' },
-      'maj9': { intervals: [0, 4, 7, 11, 14], label: 'maj9', desc: '深い浮遊感' },
-      'm9': { intervals: [0, 3, 7, 10, 14], label: 'm9', desc: 'lo-fi感' }
-    };
-    const QUALITIES = Object.fromEntries(Object.entries(QUALITY_INFO).map(([k, v]) => [k, v.intervals]));
-    const PRESETS = [
-      ['王道', ['C major','G major','A minor','F major']],
-      ['小室', ['A minor','F major','G major','C major']],
-      ['丸サ', ['D m7','G 7','C maj7','A minor']],
-      ['暗め', ['C minor','G# major','D# major','A# major']],
-      ['浮遊', ['F maj7','G major','E m7','A minor']],
-      ['Lo-fi', ['C maj7','B 7','E minor','G 7']],
-      ['EDM', ['F major','A minor','C major','G major']],
-      ['Reset', []]
-    ];
-
-    const state = {
-      sequence: [], audio: null, playingNodes: [], activeIndex: -1,
-      timers: [], loopTimer: null, isPlaying: false, bookMode: 'preview', progressTimer: null, startedAt: 0, passDuration: 0
-    };
-    const $ = id => document.getElementById(id);
-
-    function init() {
-      NOTE_NAMES.forEach(n => $('root').append(new Option(n, n)));
-      Object.keys(QUALITIES).forEach(q => $('quality').append(new Option(q, q)));
-      for (let i = 2; i <= 6; i++) $('octave').append(new Option(i, i));
-      $('octave').value = 4;
-      PRESETS.forEach(([name, chords]) => {
-        const b = document.createElement('button');
-        b.textContent = name;
-        b.onclick = () => applyPreset(chords);
-        $('presets').append(b);
-      });
-      $('addChord').onclick = addChordFromForm;
-      $('previewChord').onclick = () => previewChord(currentChordFromForm());
-      $('play').onclick = () => { $('loop').checked = false; playSequence(); };
-      $('loopPlay').onclick = () => { $('loop').checked = true; playSequence(); };
-      $('stop').onclick = stopAll;
-      $('clear').onclick = () => { stopAll(false); state.sequence = []; render(); setStatus('Cleared'); };
-      $('exportMidi').onclick = exportMidi;
-      $('exportWav').onclick = exportWav;
-      $('saveProject').onclick = saveProject;
-      $('loadProject').onchange = loadProject;
-      $('bookSearch').oninput = renderChordBook;
-      $('bookPreviewMode').onclick = toggleBookMode;
-      renderKeyboard([]);
-      render();
-      renderChordBook();
-    }
-
-    function currentChordFromForm() {
-      return { root: $('root').value, quality: $('quality').value, octave: Number($('octave').value), bars: Number($('bars').value) || 1 };
-    }
-
-    function chordLabel(chord) {
-      return `${chord.root}${QUALITY_INFO[chord.quality]?.label ?? chord.quality}`;
-    }
-
-    function midiRoot(root, octave) {
-      return 12 * (octave + 1) + NOTE_NAMES.indexOf(root);
-    }
-
-    function chordMidiNotes(chord) {
-      return QUALITIES[chord.quality].map(interval => midiRoot(chord.root, chord.octave) + interval);
-    }
-
-    function midiToFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
-
-    function addChordFromForm() {
-      state.sequence.push(currentChordFromForm());
-      render();
-      setStatus('Chord added');
-    }
-
-    function applyPreset(chords) {
-      stopAll(false);
-      if (!chords.length) { state.sequence = []; render(); setStatus('Preset reset'); return; }
-      state.sequence = chords.map(text => {
-        const [root, qualityRaw] = text.split(' ');
-        const quality = qualityRaw === 'm' ? 'minor' : qualityRaw;
-        return { root, quality, octave: 4, bars: 1 };
-      });
-      render();
-      setStatus('Preset loaded');
-    }
-
-    function render() {
-      const seq = $('sequence');
-      seq.innerHTML = '';
-      if (!state.sequence.length) {
-        const empty = document.createElement('div');
-        empty.className = 'empty';
-        empty.textContent = 'まだコードがありません。左から追加、またはコード帳・プリセットを選択。';
-        seq.append(empty);
-        $('progress').style.width = '0%';
-        return;
-      }
-      state.sequence.forEach((chord, i) => {
-        const item = document.createElement('div');
-        item.className = 'chord-item' + (i === state.activeIndex ? ' active' : '');
-        item.innerHTML = `<div class="chord-index">${String(i + 1).padStart(2, '0')}</div><div><div class="chord-name">${chordLabel(chord)}</div><div class="pill">${chord.bars} bar / octave ${chord.octave}</div></div>`;
-        const play = button('▶', () => previewChord(chord));
-        const up = button('↑', () => move(i, -1));
-        const down = button('↓', () => move(i, 1));
-        const del = button('×', () => { state.sequence.splice(i,1); render(); });
-        item.append(play, up, down, del);
-        item.onclick = e => { if (e.target.tagName !== 'BUTTON') previewChord(chord); };
-        seq.append(item);
-      });
-    }
-
-    function button(text, fn) { const b = document.createElement('button'); b.className = 'mini'; b.textContent = text; b.onclick = fn; return b; }
-    function move(i, delta) {
-      const j = i + delta;
-      if (j < 0 || j >= state.sequence.length) return;
-      [state.sequence[i], state.sequence[j]] = [state.sequence[j], state.sequence[i]];
-      render();
-    }
-
-    function renderChordBook() {
-      const query = $('bookSearch').value.trim().toLowerCase();
-      const book = $('chordBook');
-      book.innerHTML = '';
-      const chords = [];
-      NOTE_NAMES.forEach(root => {
-        Object.keys(QUALITIES).forEach(quality => {
-          const chord = { root, quality, octave: Number($('octave').value || 4), bars: Number($('bars').value || 1) };
-          const label = chordLabel(chord);
-          const haystack = `${label} ${root} ${quality} ${QUALITY_INFO[quality].desc}`.toLowerCase();
-          if (!query || haystack.includes(query)) chords.push(chord);
-        });
-      });
-      chords.forEach(chord => {
-        const card = document.createElement('button');
-        card.className = 'book-card';
-        card.innerHTML = `<strong>${chordLabel(chord)}</strong><small>${QUALITY_INFO[chord.quality].desc}</small>`;
-        card.onclick = e => {
-          if (state.bookMode === 'add' || e.altKey) {
-            state.sequence.push(chord);
-            render();
-            setStatus(`${chordLabel(chord)} added`);
-          } else {
-            previewChord(chord);
-          }
-        };
-        book.append(card);
-      });
-    }
-
-    function toggleBookMode() {
-      state.bookMode = state.bookMode === 'preview' ? 'add' : 'preview';
-      $('bookPreviewMode').textContent = state.bookMode === 'preview' ? 'Preview' : 'Add';
-      $('bookPreviewMode').classList.toggle('primary', state.bookMode === 'add');
-      setStatus(`Chord book: ${state.bookMode}`);
-    }
-
-    function ensureAudio() {
-      if (!state.audio) state.audio = new (window.AudioContext || window.webkitAudioContext)();
-      return state.audio;
-    }
-
-    function createImpulse(ctx, seconds = 1.6, decay = 2.4) {
-      const length = Math.floor(ctx.sampleRate * seconds);
-      const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
-      for (let ch = 0; ch < 2; ch++) {
-        const data = impulse.getChannelData(ch);
-        for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
-      }
-      return impulse;
-    }
-
-    function makeOutput(ctx, destination) {
-      const wetAmount = Number($('reverb').value || 0);
-      const dry = ctx.createGain();
-      dry.gain.value = 1 - wetAmount * .45;
-      if (wetAmount > 0.01 && ctx.createConvolver) {
-        const convolver = ctx.createConvolver();
-        convolver.buffer = createImpulse(ctx);
-        const wet = ctx.createGain();
-        wet.gain.value = wetAmount;
-        dry.connect(destination);
-        dry.connect(convolver);
-        convolver.connect(wet);
-        wet.connect(destination);
-      } else {
-        dry.connect(destination);
-      }
-      return dry;
-    }
-
-    function scheduleChord(ctx, chord, start, duration, destination = ctx.destination) {
-      const out = makeOutput(ctx, destination);
-      const notes = chordMidiNotes(chord);
-      const nodes = [];
-      notes.forEach((note, idx) => {
-        const jitter = Number($('humanize').value || 0) * (idx / Math.max(1, notes.length - 1));
-        nodes.push(...scheduleNote(ctx, note, start + jitter, duration, out));
-      });
-      return nodes;
-    }
-
-    function scheduleNote(ctx, midi, start, duration, destination) {
-      const instrument = $('instrument').value;
-      if (instrument === 'piano') return schedulePianoNote(ctx, midi, start, duration, destination);
-      if (instrument === 'warm') return scheduleWarmNote(ctx, midi, start, duration, destination);
-      return scheduleSimpleNote(ctx, midi, start, duration, destination, instrument);
-    }
-
-    function schedulePianoNote(ctx, midi, start, duration, destination) {
-      const velocity = Number($('velocity').value || .76);
-      const release = Number($('release').value || .82);
-      const attack = Math.max(.003, Number($('attack').value || .01));
-      const freq = midiToFreq(midi);
-      const partials = [
-        [1, 1.0, 0], [2, .46, 4], [3, .24, -3], [4, .12, 7], [5, .065, -8]
-      ];
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.0001, start);
-      master.gain.exponentialRampToValueAtTime(0.19 * velocity, start + attack);
-      master.gain.exponentialRampToValueAtTime(0.055 * velocity, start + Math.min(duration * .55, 1.2));
-      master.gain.setValueAtTime(0.045 * velocity, Math.max(start + attack, start + duration - release));
-      master.gain.exponentialRampToValueAtTime(0.0001, start + duration + release);
-      master.connect(destination);
-      const nodes = [];
-      partials.forEach(([mul, amp, cents]) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = mul === 1 ? 'triangle' : 'sine';
-        osc.frequency.value = freq * mul * Math.pow(2, cents / 1200);
-        gain.gain.value = amp;
-        osc.connect(gain);
-        gain.connect(master);
-        osc.start(start);
-        osc.stop(start + duration + release + .08);
-        nodes.push(osc);
-      });
-      return nodes;
-    }
-
-    function scheduleWarmNote(ctx, midi, start, duration, destination) {
-      return scheduleSimpleNote(ctx, midi, start, duration + .3, destination, 'triangle', .12, .9);
-    }
-
-    function scheduleSimpleNote(ctx, midi, start, duration, destination, type = 'sawtooth', level = .15, relOverride = null) {
-      const attack = Number($('attack').value || .03);
-      const release = relOverride ?? Number($('release').value || .35);
-      const velocity = Number($('velocity').value || .76);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(level * velocity, start + Math.max(0.005, attack));
-      gain.gain.setValueAtTime(level * velocity, Math.max(start, start + duration - release));
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration + release);
-      gain.connect(destination);
-      const osc = ctx.createOscillator();
-      osc.type = type;
-      osc.frequency.value = midiToFreq(midi);
-      osc.connect(gain);
-      osc.start(start);
-      osc.stop(start + duration + release + .05);
-      return [osc];
-    }
-
-    function previewChord(chord) {
-      const ctx = ensureAudio();
-      stopAll(false);
-      state.playingNodes.push(...scheduleChord(ctx, chord, ctx.currentTime + 0.02, 1.45));
-      renderKeyboard(chordMidiNotes(chord));
-      setStatus(`Preview: ${chordLabel(chord)}`);
-      window.setTimeout(() => renderKeyboard([]), 1900);
-    }
-
-    function sequenceDurationSeconds() {
-      const beat = 60 / Number($('bpm').value || 100);
-      return state.sequence.reduce((sum, c) => sum + c.bars * 4 * beat, 0);
-    }
-
-    function playSequence() {
-      if (!state.sequence.length) return setStatus('Add chords first');
-      stopAll(false);
-      state.isPlaying = true;
-      scheduleSequencePass();
-    }
-
-    function scheduleSequencePass() {
-      if (!state.isPlaying) return;
-      const ctx = ensureAudio();
-      const beat = 60 / Number($('bpm').value || 100);
-      let t = ctx.currentTime + 0.08;
-      state.startedAt = t;
-      state.passDuration = sequenceDurationSeconds();
-      startProgressLoop(ctx);
-      state.sequence.forEach((chord, i) => {
-        const dur = chord.bars * 4 * beat;
-        state.playingNodes.push(...scheduleChord(ctx, chord, t, dur));
-        state.timers.push(setTimeout(() => { state.activeIndex = i; render(); renderKeyboard(chordMidiNotes(chord)); }, Math.max(0, (t - ctx.currentTime) * 1000)));
-        t += dur;
-      });
-      const endMs = Math.max(0, (t - ctx.currentTime) * 1000);
-      state.timers.push(setTimeout(() => {
-        state.activeIndex = -1;
-        render();
-        renderKeyboard([]);
-        if ($('loop').checked && state.isPlaying) {
-          setStatus('Looping');
-          state.loopTimer = setTimeout(scheduleSequencePass, 120);
-        } else {
-          state.isPlaying = false;
-          setStatus('Ready');
-          $('progress').style.width = '0%';
-          clearInterval(state.progressTimer);
-        }
-      }, endMs));
-      setStatus($('loop').checked ? 'Loop playing' : 'Playing');
-    }
-
-    function startProgressLoop(ctx) {
-      clearInterval(state.progressTimer);
-      state.progressTimer = setInterval(() => {
-        if (!state.isPlaying || !state.passDuration) return;
-        const elapsed = Math.max(0, ctx.currentTime - state.startedAt);
-        const pct = Math.min(100, (elapsed / state.passDuration) * 100);
-        $('progress').style.width = `${pct}%`;
-      }, 80);
-    }
-
-    function stopAll(updateStatus = true) {
-      state.isPlaying = false;
-      state.playingNodes.forEach(n => { try { n.stop(); } catch {} });
-      state.playingNodes = [];
-      state.timers.forEach(clearTimeout);
-      state.timers = [];
-      clearTimeout(state.loopTimer);
-      clearInterval(state.progressTimer);
-      state.loopTimer = null;
-      state.activeIndex = -1;
-      $('progress').style.width = '0%';
-      renderKeyboard([]);
-      render();
-      if (updateStatus) setStatus('Stopped');
-    }
-
-    function renderKeyboard(notes) {
-      const kb = $('keyboard');
-      kb.innerHTML = '';
-      const activePitchClasses = new Set(notes.map(n => n % 12));
-      NOTE_NAMES.forEach((name, i) => {
-        const key = document.createElement('div');
-        key.className = 'key ' + (name.includes('#') ? 'black ' : '') + (activePitchClasses.has(i) ? 'on' : '');
-        key.title = name;
-        kb.append(key);
-      });
-    }
-
-    function setStatus(text) { $('status').textContent = text; }
-
-    function exportMidi() {
-      if (!state.sequence.length) return setStatus('No chords to export');
-      const ppq = 480;
-      const bpm = Number($('bpm').value || 100);
-      const tempo = Math.round(60000000 / bpm);
-      const events = [];
-      let tick = 0;
-      state.sequence.forEach(chord => {
-        const dur = Math.round(chord.bars * 4 * ppq);
-        chordMidiNotes(chord).forEach(n => events.push({ tick, type: 'on', note: n }));
-        chordMidiNotes(chord).forEach(n => events.push({ tick: tick + dur, type: 'off', note: n }));
-        tick += dur;
-      });
-      events.sort((a,b) => a.tick - b.tick || (a.type === 'off' ? -1 : 1));
-      const track = [];
-      pushVar(track, 0); track.push(0xff, 0x51, 0x03, (tempo>>16)&255, (tempo>>8)&255, tempo&255);
-      pushVar(track, 0); track.push(0xff, 0x58, 0x04, 4, 2, 24, 8);
-      let last = 0;
-      events.forEach(e => {
-        pushVar(track, e.tick - last);
-        last = e.tick;
-        track.push(e.type === 'on' ? 0x90 : 0x80, e.note, e.type === 'on' ? Math.round(105 * Number($('velocity').value || .76)) : 0);
-      });
-      pushVar(track, 0); track.push(0xff, 0x2f, 0x00);
-      const bytes = [...ascii('MThd'), 0,0,0,6, 0,0, 0,1, (ppq>>8)&255, ppq&255, ...ascii('MTrk'), ...u32(track.length), ...track];
-      download(new Blob([new Uint8Array(bytes)], { type: 'audio/midi' }), 'chord-sequence.mid');
-      setStatus('MIDI exported');
-    }
-
-    function pushVar(arr, value) {
-      let buffer = value & 0x7f;
-      while ((value >>= 7)) { buffer <<= 8; buffer |= ((value & 0x7f) | 0x80); }
-      while (true) { arr.push(buffer & 0xff); if (buffer & 0x80) buffer >>= 8; else break; }
-    }
-    function ascii(s) { return [...s].map(c => c.charCodeAt(0)); }
-    function u32(n) { return [(n>>>24)&255, (n>>>16)&255, (n>>>8)&255, n&255]; }
-
-    async function exportWav() {
-      if (!state.sequence.length) return setStatus('No chords to export');
-      setStatus('Rendering WAV...');
-      const bpm = Number($('bpm').value || 100);
-      const beat = 60 / bpm;
-      const duration = sequenceDurationSeconds() + 2.2;
-      const sampleRate = 44100;
-      const ctx = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
-      const master = ctx.createGain();
-      master.gain.value = 0.82;
-      master.connect(ctx.destination);
-      let t = 0.06;
-      state.sequence.forEach(chord => {
-        const dur = chord.bars * 4 * beat;
-        scheduleOfflineChord(ctx, chord, t, dur, master);
-        t += dur;
-      });
-      const buffer = await ctx.startRendering();
-      download(audioBufferToWav(buffer), 'chord-sequence.wav');
-      setStatus('WAV exported');
-    }
-
-    function scheduleOfflineChord(ctx, chord, start, duration, destination) {
-      const notes = chordMidiNotes(chord);
-      notes.forEach((note, idx) => {
-        const jitter = Number($('humanize').value || 0) * (idx / Math.max(1, notes.length - 1));
-        scheduleOfflineNote(ctx, note, start + jitter, duration, destination);
-      });
-    }
-
-    function scheduleOfflineNote(ctx, midi, start, duration, destination) {
-      const instrument = $('instrument').value;
-      if (instrument === 'piano') return schedulePianoNote(ctx, midi, start, duration, destination);
-      if (instrument === 'warm') return scheduleWarmNote(ctx, midi, start, duration, destination);
-      return scheduleSimpleNote(ctx, midi, start, duration, destination, instrument);
-    }
-
-    function audioBufferToWav(buffer) {
-      const channels = buffer.numberOfChannels;
-      const length = buffer.length * channels * 2 + 44;
-      const view = new DataView(new ArrayBuffer(length));
-      let offset = 0;
-      writeString('RIFF'); view.setUint32(offset, length - 8, true); offset += 4; writeString('WAVE');
-      writeString('fmt '); view.setUint32(offset, 16, true); offset += 4; view.setUint16(offset, 1, true); offset += 2;
-      view.setUint16(offset, channels, true); offset += 2; view.setUint32(offset, buffer.sampleRate, true); offset += 4;
-      view.setUint32(offset, buffer.sampleRate * channels * 2, true); offset += 4; view.setUint16(offset, channels * 2, true); offset += 2;
-      view.setUint16(offset, 16, true); offset += 2; writeString('data'); view.setUint32(offset, length - 44, true); offset += 4;
-      for (let i = 0; i < buffer.length; i++) {
-        for (let ch = 0; ch < channels; ch++) {
-          const sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
-          view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-          offset += 2;
-        }
-      }
-      function writeString(s) { for (let i=0; i<s.length; i++) view.setUint8(offset++, s.charCodeAt(i)); }
-      return new Blob([view], { type: 'audio/wav' });
-    }
-
-    function saveProject() {
-      download(new Blob([JSON.stringify({
-        version: 2,
-        bpm: $('bpm').value,
-        instrument: $('instrument').value,
-        loop: $('loop').checked,
-        attack: $('attack').value,
-        release: $('release').value,
-        velocity: $('velocity').value,
-        humanize: $('humanize').value,
-        reverb: $('reverb').value,
-        sequence: state.sequence
-      }, null, 2)], { type: 'application/json' }), 'chord-sequence.json');
-      setStatus('Project saved');
-    }
-
-    async function loadProject(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const data = JSON.parse(await file.text());
-      if (data.bpm) $('bpm').value = data.bpm;
-      if (data.instrument) $('instrument').value = data.instrument;
-      if (typeof data.loop === 'boolean') $('loop').checked = data.loop;
-      ['attack','release','velocity','humanize','reverb'].forEach(id => { if (data[id] !== undefined) $(id).value = data[id]; });
-      if (Array.isArray(data.sequence)) state.sequence = data.sequence;
-      render();
-      renderChordBook();
-      setStatus('Project loaded');
-    }
-
-    function download(blob, filename) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename; a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-    init();
+    const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    const QUALITY_INFO={major:{intervals:[0,4,7],label:'',desc:'明るい基本形'},minor:{intervals:[0,3,7],label:'m',desc:'暗い基本形'},dim:{intervals:[0,3,6],label:'dim',desc:'不安定・緊張'},m7b5:{intervals:[0,3,6,10],label:'m7b5',desc:'半減七・ジャズ'},aug:{intervals:[0,4,8],label:'aug',desc:'浮遊・不思議'},sus2:{intervals:[0,2,7],label:'sus2',desc:'透明感'},sus4:{intervals:[0,5,7],label:'sus4',desc:'解決感'},maj7:{intervals:[0,4,7,11],label:'maj7',desc:'都会的・柔らかい'},m7:{intervals:[0,3,7,10],label:'m7',desc:'落ち着いた暗さ'},'7':{intervals:[0,4,7,10],label:'7',desc:'次へ進みたい'},mMaj7:{intervals:[0,3,7,11],label:'mMaj7',desc:'映画的・怪しい'},add9:{intervals:[0,4,7,14],label:'add9',desc:'爽やか'},madd9:{intervals:[0,3,7,14],label:'madd9',desc:'切ない'},'6':{intervals:[0,4,7,9],label:'6',desc:'レトロ'},m6:{intervals:[0,3,7,9],label:'m6',desc:'ジャズ感'},'9':{intervals:[0,4,7,10,14],label:'9',desc:'ファンク/ジャズ'},maj9:{intervals:[0,4,7,11,14],label:'maj9',desc:'深い浮遊感'},m9:{intervals:[0,3,7,10,14],label:'m9',desc:'lo-fi感'}};
+    const QUALITIES=Object.fromEntries(Object.entries(QUALITY_INFO).map(([k,v])=>[k,v.intervals]));
+    const PRESETS=[['王道',['C major','G major','A minor','F major']],['小室',['A minor','F major','G major','C major']],['丸サ',['F maj7','E 7','A m7','C 7']],['コンファメ',['F maj7','E m7','A 7','D m7','G 7','C maj7','A m7','D 7','G m7','C 7']],['枯葉',['A m7','D 7','G maj7','C maj7','F# m7b5','B 7','E minor','E 7']],['カノン',['C major','G major','A minor','E minor','F major','C major','F major','G major']],['王道JPOP',['F major','G major','E m7','A minor']],['逆循環',['C maj7','A 7','D m7','G 7']],['Just Two',['F maj7','E 7','A minor','C 7']],['Neo Soul',['C maj9','B 7','E m9','A 9','D m9','G 9','C maj9','G 9']],['Andalusian',['A minor','G major','F major','E 7']],['Blues',['C 7','F 7','C 7','G 7','F 7','C 7']],['暗め',['C minor','G# major','D# major','A# major']],['浮遊',['F maj7','G major','E m7','A minor']],['Lo-fi',['C maj7','B 7','E minor','G 7']],['EDM',['F major','A minor','C major','G major']],['Royal Road 2',['D minor','G major','C major','A minor']],['Jazz ii-V-I',['D m7','G 7','C maj7','C maj7']],['Minor ii-V-i',['F# m7b5','B 7','E minor','E minor']],['City Pop',['C maj9','A 9','D m9','G 9']],['Future Bass',['F add9','G add9','A minor','E minor']],['Sad Pop',['A minor','F maj7','C major','G major']],['Dorian Loop',['D m7','G 7','D m7','C major']],['Reset',[]]];
+    const state={sequence:[],audio:null,nodes:[],timers:[],active:-1,isPlaying:false,loopTimer:null,progressTimer:null,startedAt:0,passDuration:0,bookMode:'preview',sf2:null};
+    const $=id=>document.getElementById(id);function setStatus(t){$('statusText').value=t}function label(c){return `${c.root}${QUALITY_INFO[c.quality]?.label??c.quality}`}function midiRoot(r,o){return 12*(o+1)+NOTE_NAMES.indexOf(r)}function notes(c){return QUALITIES[c.quality].map(i=>midiRoot(c.root,c.octave)+i)}function freq(m){return 440*Math.pow(2,(m-69)/12)}
+    function parseChord(text){const [root,qRaw]=text.split(' ');const quality=qRaw==='m'?'minor':qRaw;return{root,quality,octave:4,bars:1}}function current(){return{root:$('root').value,quality:$('quality').value,octave:Number($('octave').value),bars:Number($('bars').value)||1}}
+    function init(){NOTE_NAMES.forEach(n=>$('root').append(new Option(n,n)));Object.keys(QUALITIES).forEach(q=>$('quality').append(new Option(q,q)));for(let i=2;i<=6;i++)$('octave').append(new Option(i,i));$('octave').value=4;PRESETS.forEach(([name,chords])=>{const b=document.createElement('button');b.textContent=name;b.onclick=()=>applyPreset(chords);$('presets').append(b)});$('addChord').onclick=()=>{state.sequence.push(current());render();setStatus('Chord added')};$('previewChord').onclick=()=>preview(current());$('play').onclick=()=>{$('loop').checked=false;play()};$('loopPlay').onclick=()=>{$('loop').checked=true;play()};$('stop').onclick=stopAll;$('clear').onclick=()=>{stopAll(false);state.sequence=[];render();setStatus('Cleared')};$('exportMidi').onclick=exportMidi;$('exportWav').onclick=exportWav;$('saveProject').onclick=saveProject;$('loadProject').onchange=loadProject;$('bookSearch').oninput=renderBook;$('bookMode').onclick=toggleBook;$('sf2File').onchange=loadSf2;renderKeyboard([]);render();renderBook()}
+    function applyPreset(chords){stopAll(false);state.sequence=chords.map(parseChord);render();setStatus(chords.length?'Preset loaded':'Preset reset')}
+    function render(){const seq=$('sequence');seq.innerHTML='';if(!state.sequence.length){seq.innerHTML='<div class="empty">追加したコードがここに並びます。</div>';$('progress').style.width='0%';return}state.sequence.forEach((c,i)=>{const item=document.createElement('div');item.className='chord-item'+(i===state.active?' active':'');item.innerHTML=`<div class="idx">${String(i+1).padStart(2,'0')}</div><div><div class="name">${label(c)}</div><div class="pill">${c.bars} bar / octave ${c.octave}</div></div>`;item.append(btn('▶',()=>preview(c)),btn('↑',()=>move(i,-1)),btn('↓',()=>move(i,1)),btn('×',()=>{state.sequence.splice(i,1);render()}));item.onclick=e=>{if(e.target.tagName!=='BUTTON')preview(c)};seq.append(item)})}
+    function btn(t,fn){const b=document.createElement('button');b.className='mini';b.textContent=t;b.onclick=fn;return b}function move(i,d){const j=i+d;if(j<0||j>=state.sequence.length)return;[state.sequence[i],state.sequence[j]]=[state.sequence[j],state.sequence[i]];render()}
+    function renderBook(){const q=$('bookSearch').value.trim().toLowerCase(),book=$('chordBook');book.innerHTML='';const list=[];NOTE_NAMES.forEach(root=>Object.keys(QUALITIES).forEach(quality=>{const c={root,quality,octave:Number($('octave').value||4),bars:Number($('bars').value||1)},hay=`${label(c)} ${root} ${quality} ${QUALITY_INFO[quality].desc}`.toLowerCase();if(!q||hay.includes(q))list.push(c)}));list.forEach(c=>{const b=document.createElement('button');b.className='book-card';b.innerHTML=`<strong>${label(c)}</strong><small>${QUALITY_INFO[c.quality].desc}</small>`;b.onclick=e=>{if(state.bookMode==='add'||e.altKey){state.sequence.push(c);render();setStatus(`${label(c)} added`)}else preview(c)};book.append(b)})}
+    function toggleBook(){state.bookMode=state.bookMode==='preview'?'add':'preview';$('bookMode').textContent=state.bookMode==='preview'?'Preview':'Add';$('bookMode').classList.toggle('primary',state.bookMode==='add');setStatus(`Chord book: ${state.bookMode}`)}function audio(){return state.audio||(state.audio=new(window.AudioContext||window.webkitAudioContext)())}
+    function impulse(ctx,seconds=1.4,decay=2.4){const len=Math.floor(ctx.sampleRate*seconds),buf=ctx.createBuffer(2,len,ctx.sampleRate);for(let ch=0;ch<2;ch++){const data=buf.getChannelData(ch);for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)}return buf}
+    function output(ctx,dest){const wet=Number($('reverb').value||0),dry=ctx.createGain();dry.gain.value=1-wet*.45;if(wet>.01&&ctx.createConvolver){const conv=ctx.createConvolver(),wg=ctx.createGain();conv.buffer=impulse(ctx);wg.gain.value=wet;dry.connect(dest);dry.connect(conv);conv.connect(wg);wg.connect(dest)}else dry.connect(dest);return dry}
+    function scheduleChord(ctx,c,start,dur,dest=ctx.destination){const out=output(ctx,dest),ns=notes(c),nodes=[];ns.forEach((n,i)=>nodes.push(...scheduleNote(ctx,n,start+Number($('humanize').value||0)*(i/Math.max(1,ns.length-1)),dur,out)));return nodes}
+    function scheduleNote(ctx,m,start,dur,dest){const inst=$('instrument').value;if(inst==='sf2')return scheduleSf2Note(ctx,m,start,dur,dest);if(inst==='piano')return schedulePiano(ctx,m,start,dur,dest);if(inst==='warm')return scheduleSimple(ctx,m,start,dur+.3,dest,'triangle',.12,.9);return scheduleSimple(ctx,m,start,dur,dest,inst)}
+    function schedulePiano(ctx,m,start,dur,dest){const vel=Number($('velocity').value||.76),rel=Number($('release').value||.82),atk=Math.max(.003,Number($('attack').value||.01)),f=freq(m),master=ctx.createGain(),nodes=[];master.gain.setValueAtTime(.0001,start);master.gain.exponentialRampToValueAtTime(.19*vel,start+atk);master.gain.exponentialRampToValueAtTime(.055*vel,start+Math.min(dur*.55,1.2));master.gain.setValueAtTime(.045*vel,Math.max(start+atk,start+dur-rel));master.gain.exponentialRampToValueAtTime(.0001,start+dur+rel);master.connect(dest);[[1,1,0],[2,.46,4],[3,.24,-3],[4,.12,7],[5,.065,-8]].forEach(([mul,amp,cents])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=mul===1?'triangle':'sine';o.frequency.value=f*mul*Math.pow(2,cents/1200);g.gain.value=amp;o.connect(g);g.connect(master);o.start(start);o.stop(start+dur+rel+.08);nodes.push(o)});return nodes}
+    function scheduleSimple(ctx,m,start,dur,dest,type='sawtooth',level=.15,relOverride=null){const atk=Number($('attack').value||.03),rel=relOverride??Number($('release').value||.35),vel=Number($('velocity').value||.76),g=ctx.createGain(),o=ctx.createOscillator();g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(level*vel,start+Math.max(.005,atk));g.gain.setValueAtTime(level*vel,Math.max(start,start+dur-rel));g.gain.exponentialRampToValueAtTime(.0001,start+dur+rel);g.connect(dest);o.type=type;o.frequency.value=freq(m);o.connect(g);o.start(start);o.stop(start+dur+rel+.05);return[o]}
+    function parseSf2(ab){const v=new DataView(ab),txt=(o,l)=>Array.from(new Uint8Array(ab,o,l)).map(c=>c?String.fromCharCode(c):'').join(''),u32=o=>v.getUint32(o,true),u16=o=>v.getUint16(o,true),i8=o=>v.getInt8(o),chunk=(target,from=12,to=ab.byteLength)=>{for(let p=from;p+8<=to;){const id=txt(p,4),size=u32(p+4),data=p+8;if(id===target)return{id,data,size,end:data+size};if(id==='LIST'){const type=txt(data,4);if(type===target)return{id,data:data+4,size:size-4,end:data+size}}p=data+size+(size&1)}return null};if(txt(0,4)!=='RIFF'||txt(8,4)!=='sfbk')throw Error('Not SoundFont 2');const sdta=chunk('sdta'),pdta=chunk('pdta');if(!sdta||!pdta)throw Error('Missing sdta/pdta');const smpl=chunk('smpl',sdta.data,sdta.end),shdr=chunk('shdr',pdta.data,pdta.end);if(!smpl||!shdr)throw Error('Missing smpl/shdr');const samples=[];for(let p=shdr.data;p+46<=shdr.end;p+=46){const name=txt(p,20).replace(/\0/g,'').trim();if(!name||name==='EOS')continue;const start=u32(p+20),end=u32(p+24),loopStart=u32(p+28),loopEnd=u32(p+32),sampleRate=u32(p+36)||44100,originalPitch=v.getUint8(p+40)||60,pitchCorrection=i8(p+41)||0,sampleType=u16(p+44),frames=Math.max(0,end-start);if(!frames||frames>20000000)continue;const data=new Float32Array(frames),byteStart=smpl.data+start*2;for(let i=0;i<frames;i++)data[i]=v.getInt16(byteStart+i*2,true)/32768;samples.push({name,data,sampleRate,originalPitch,pitchCorrection,loopStart:loopStart-start,loopEnd:loopEnd-start,sampleType})}if(!samples.length)throw Error('No usable PCM samples');samples.sort((a,b)=>a.originalPitch-b.originalPitch);return{samples}}
+    async function loadSf2(e){const file=e.target.files[0];if(!file)return;try{setStatus('Loading SF2...');state.sf2=parseSf2(await file.arrayBuffer());$('instrument').value='sf2';setStatus(`SF2 loaded: ${file.name} / ${state.sf2.samples.length} samples`)}catch(err){console.error(err);state.sf2=null;setStatus('SF2 load failed');alert('SF2の読み込みに失敗: '+err.message+'\n16bit PCMの一般的な.sf2を試してください。')}}function findSf2(m){if(!state.sf2?.samples?.length)return null;return state.sf2.samples.reduce((best,s)=>Math.abs((s.originalPitch||60)-m)<Math.abs((best.originalPitch||60)-m)?s:best,state.sf2.samples[0])}
+    function scheduleSf2Note(ctx,m,start,dur,dest){const s=findSf2(m);if(!s)return schedulePiano(ctx,m,start,dur,dest);const b=ctx.createBuffer(1,s.data.length,s.sampleRate);b.copyToChannel(s.data,0);const src=ctx.createBufferSource(),g=ctx.createGain(),vel=Number($('velocity').value||.76),atk=Math.max(.003,Number($('attack').value||.01)),rel=Number($('release').value||.82);src.buffer=b;src.playbackRate.value=Math.pow(2,(m-(s.originalPitch||60)-(s.pitchCorrection||0)/100)/12);g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(.34*vel,start+atk);g.gain.setValueAtTime(.30*vel,Math.max(start+atk,start+dur-rel));g.gain.exponentialRampToValueAtTime(.0001,start+dur+rel);src.connect(g);g.connect(dest);src.start(start);src.stop(start+dur+rel+.08);return[src]}
+    function preview(c){const ctx=audio();stopAll(false);state.nodes.push(...scheduleChord(ctx,c,ctx.currentTime+.02,1.45));renderKeyboard(notes(c));setStatus(`Preview: ${label(c)}`);setTimeout(()=>renderKeyboard([]),1900)}function duration(){const beat=60/Number($('bpm').value||100);return state.sequence.reduce((s,c)=>s+c.bars*4*beat,0)}
+    function play(){if(!state.sequence.length)return setStatus('Add chords first');stopAll(false);state.isPlaying=true;schedulePass()}function schedulePass(){if(!state.isPlaying)return;const ctx=audio(),beat=60/Number($('bpm').value||100);let t=ctx.currentTime+.08;state.startedAt=t;state.passDuration=duration();progress(ctx);state.sequence.forEach((c,i)=>{const dur=c.bars*4*beat;state.nodes.push(...scheduleChord(ctx,c,t,dur));state.timers.push(setTimeout(()=>{state.active=i;render();renderKeyboard(notes(c))},Math.max(0,(t-ctx.currentTime)*1000)));t+=dur});state.timers.push(setTimeout(()=>{state.active=-1;render();renderKeyboard([]);if($('loop').checked&&state.isPlaying){setStatus('Looping');state.loopTimer=setTimeout(schedulePass,120)}else{state.isPlaying=false;setStatus('Ready');$('progress').style.width='0%';clearInterval(state.progressTimer)}},Math.max(0,(t-ctx.currentTime)*1000)));setStatus($('loop').checked?'Loop playing':'Playing')}
+    function progress(ctx){clearInterval(state.progressTimer);state.progressTimer=setInterval(()=>{if(!state.isPlaying||!state.passDuration)return;const pct=Math.min(100,Math.max(0,(ctx.currentTime-state.startedAt)/state.passDuration*100));$('progress').style.width=pct+'%'},80)}
+    function stopAll(update=true){state.isPlaying=false;state.nodes.forEach(n=>{try{n.stop()}catch{}});state.nodes=[];state.timers.forEach(clearTimeout);state.timers=[];clearTimeout(state.loopTimer);clearInterval(state.progressTimer);state.active=-1;$('progress').style.width='0%';renderKeyboard([]);render();if(update)setStatus('Stopped')}
+    function renderKeyboard(ns){const kb=$('keyboard');kb.innerHTML='';const on=new Set(ns.map(n=>n%12));NOTE_NAMES.forEach((name,i)=>{const k=document.createElement('div');k.className='key '+(name.includes('#')?'black ':'')+(on.has(i)?'on':'');k.title=name;kb.append(k)})}
+    function exportMidi(){if(!state.sequence.length)return setStatus('No chords');const ppq=480,bpm=Number($('bpm').value||100),tempo=Math.round(60000000/bpm),events=[];let tick=0;state.sequence.forEach(c=>{const dur=Math.round(c.bars*4*ppq);notes(c).forEach(n=>events.push({tick,type:'on',note:n}));notes(c).forEach(n=>events.push({tick:tick+dur,type:'off',note:n}));tick+=dur});events.sort((a,b)=>a.tick-b.tick||(a.type==='off'?-1:1));const track=[];varlen(track,0);track.push(0xff,0x51,3,(tempo>>16)&255,(tempo>>8)&255,tempo&255);varlen(track,0);track.push(0xff,0x58,4,4,2,24,8);let last=0;events.forEach(e=>{varlen(track,e.tick-last);last=e.tick;track.push(e.type==='on'?0x90:0x80,e.note,e.type==='on'?Math.round(105*Number($('velocity').value||.76)):0)});varlen(track,0);track.push(0xff,0x2f,0);const bytes=[...ascii('MThd'),0,0,0,6,0,0,0,1,(ppq>>8)&255,ppq&255,...ascii('MTrk'),...u32(track.length),...track];download(new Blob([new Uint8Array(bytes)],{type:'audio/midi'}),'chord-sequence.mid');setStatus('MIDI exported')}function varlen(arr,v){let b=v&0x7f;while((v>>=7)){b<<=8;b|=(v&0x7f)|0x80}while(true){arr.push(b&255);if(b&0x80)b>>=8;else break}}function ascii(s){return[...s].map(c=>c.charCodeAt(0))}function u32(n){return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255]}
+    async function exportWav(){if(!state.sequence.length)return setStatus('No chords');setStatus('Rendering WAV...');const beat=60/Number($('bpm').value||100),dur=duration()+2.2,sr=44100,ctx=new OfflineAudioContext(2,Math.ceil(dur*sr),sr),master=ctx.createGain();master.gain.value=.82;master.connect(ctx.destination);let t=.06;state.sequence.forEach(c=>{const d=c.bars*4*beat;scheduleChord(ctx,c,t,d,master);t+=d});const buffer=await ctx.startRendering();download(wav(buffer),'chord-sequence.wav');setStatus('WAV exported')}function wav(buffer){const ch=buffer.numberOfChannels,len=buffer.length*ch*2+44,view=new DataView(new ArrayBuffer(len));let o=0;ws('RIFF');view.setUint32(o,len-8,true);o+=4;ws('WAVE');ws('fmt ');view.setUint32(o,16,true);o+=4;view.setUint16(o,1,true);o+=2;view.setUint16(o,ch,true);o+=2;view.setUint32(o,buffer.sampleRate,true);o+=4;view.setUint32(o,buffer.sampleRate*ch*2,true);o+=4;view.setUint16(o,ch*2,true);o+=2;view.setUint16(o,16,true);o+=2;ws('data');view.setUint32(o,len-44,true);o+=4;for(let i=0;i<buffer.length;i++)for(let c=0;c<ch;c++){const s=Math.max(-1,Math.min(1,buffer.getChannelData(c)[i]));view.setInt16(o,s<0?s*0x8000:s*0x7fff,true);o+=2}function ws(s){for(let i=0;i<s.length;i++)view.setUint8(o++,s.charCodeAt(i))}return new Blob([view],{type:'audio/wav'})}
+    function saveProject(){download(new Blob([JSON.stringify({version:3,bpm:$('bpm').value,instrument:$('instrument').value,loop:$('loop').checked,attack:$('attack').value,release:$('release').value,velocity:$('velocity').value,humanize:$('humanize').value,reverb:$('reverb').value,sequence:state.sequence},null,2)],{type:'application/json'}),'chord-sequence.json');setStatus('Project saved')}async function loadProject(e){const file=e.target.files[0];if(!file)return;const d=JSON.parse(await file.text());['bpm','instrument','attack','release','velocity','humanize','reverb'].forEach(id=>{if(d[id]!==undefined)$(id).value=d[id]});if(typeof d.loop==='boolean')$('loop').checked=d.loop;if(Array.isArray(d.sequence))state.sequence=d.sequence;render();renderBook();setStatus('Project loaded')}
+    function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}init();
   </script>
 </body>
 </html>
