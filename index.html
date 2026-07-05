@@ -7,105 +7,204 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #090b10;
-      --panel: rgba(255,255,255,.075);
-      --panel-2: rgba(255,255,255,.115);
-      --text: #f5f7fb;
-      --muted: #aeb7cc;
-      --accent: #9cecff;
-      --accent-2: #b9ff8a;
-      --danger: #ff7d97;
-      --border: rgba(255,255,255,.16);
-      --shadow: 0 24px 80px rgba(0,0,0,.35);
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #070810;
+      --panel: rgba(255,255,255,.078);
+      --panel-strong: rgba(255,255,255,.13);
+      --glass: rgba(9,12,22,.72);
+      --text: #f8fbff;
+      --muted: #aab5ca;
+      --soft: #d9e4ff;
+      --accent: #7ce8ff;
+      --accent-2: #d7ff75;
+      --accent-3: #c69bff;
+      --danger: #ff7d9a;
+      --border: rgba(255,255,255,.15);
+      --border-hot: rgba(124,232,255,.42);
+      --shadow: 0 28px 100px rgba(0,0,0,.42);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--text);
       background:
-        radial-gradient(circle at 15% 15%, rgba(156,236,255,.16), transparent 32rem),
-        radial-gradient(circle at 90% 10%, rgba(185,255,138,.13), transparent 28rem),
-        linear-gradient(135deg, #07080d, #111421 55%, #080b12);
+        radial-gradient(circle at 9% 9%, rgba(124,232,255,.22), transparent 27rem),
+        radial-gradient(circle at 88% 6%, rgba(215,255,117,.16), transparent 24rem),
+        radial-gradient(circle at 50% 108%, rgba(198,155,255,.17), transparent 30rem),
+        linear-gradient(135deg, #05060b, #101522 50%, #070811);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
     }
 
     header {
-      padding: 36px clamp(18px, 4vw, 56px) 20px;
-      display: flex;
-      justify-content: space-between;
+      position: relative;
+      padding: 38px clamp(18px, 4vw, 58px) 22px;
+      display: grid;
+      grid-template-columns: 1fr auto;
       gap: 24px;
       align-items: end;
     }
-
-    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4.7rem); letter-spacing: -.06em; line-height: .92; }
-    .lead { color: var(--muted); max-width: 720px; margin: 14px 0 0; font-size: 1.02rem; }
-    .status { color: var(--accent-2); font-weight: 700; white-space: nowrap; }
-
-    main { padding: 0 clamp(18px, 4vw, 56px) 48px; display: grid; gap: 20px; }
-    .grid { display: grid; grid-template-columns: minmax(320px, 420px) 1fr; gap: 20px; align-items: start; }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
+    h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.45rem, 7vw, 6.6rem);
+      letter-spacing: -.075em;
+      line-height: .84;
     }
-    .card h2 { margin: 0 0 14px; font-size: 1.08rem; letter-spacing: -.02em; }
-    label { display: grid; gap: 8px; color: var(--muted); font-size: .9rem; }
+    .lead { color: var(--muted); max-width: 760px; margin: 18px 0 0; font-size: clamp(.95rem, 2vw, 1.12rem); line-height: 1.8; }
+    .top-badges { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .status, .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,.075);
+      color: var(--soft);
+      font-weight: 850;
+      white-space: nowrap;
+      box-shadow: 0 12px 36px rgba(0,0,0,.18);
+    }
+    .status::before { content: "●"; color: var(--accent-2); font-size: .76rem; }
+
+    main { position: relative; padding: 0 clamp(18px, 4vw, 58px) 54px; display: grid; gap: 20px; }
+    .grid { display: grid; grid-template-columns: minmax(320px, 440px) 1fr; gap: 20px; align-items: start; }
+    .wide-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 20px; align-items: start; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.105), rgba(255,255,255,.055));
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+    .card h2 { margin: 0 0 15px; font-size: 1.08rem; letter-spacing: -.025em; display: flex; align-items: center; gap: 9px; }
+    .card h2 span { color: var(--accent); }
+    label { display: grid; gap: 8px; color: var(--muted); font-size: .9rem; font-weight: 720; }
     input, select, button {
       border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(0,0,0,.28);
+      border-radius: 17px;
+      background: rgba(0,0,0,.32);
       color: var(--text);
       padding: 12px 13px;
       font: inherit;
+      outline: none;
     }
+    input:focus, select:focus { border-color: var(--border-hot); box-shadow: 0 0 0 4px rgba(124,232,255,.08); }
     input[type="range"] { padding: 0; accent-color: var(--accent); }
-    button { cursor: pointer; font-weight: 800; transition: transform .12s ease, background .12s ease, border-color .12s ease; }
-    button:hover { transform: translateY(-1px); background: var(--panel-2); border-color: rgba(156,236,255,.45); }
-    button.primary { background: linear-gradient(135deg, rgba(156,236,255,.28), rgba(185,255,138,.22)); border-color: rgba(156,236,255,.55); }
+    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+    button { cursor: pointer; font-weight: 900; transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease; user-select: none; }
+    button:hover { transform: translateY(-1px); background: rgba(255,255,255,.13); border-color: var(--border-hot); box-shadow: 0 12px 30px rgba(0,0,0,.16); }
+    button.primary { background: linear-gradient(135deg, rgba(124,232,255,.28), rgba(215,255,117,.2)); border-color: rgba(124,232,255,.56); }
+    button.secondary { background: linear-gradient(135deg, rgba(198,155,255,.24), rgba(124,232,255,.12)); }
     button.danger { color: var(--danger); }
+    button.mini { padding: 9px 10px; border-radius: 13px; font-size: .88rem; }
     button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .row > * { flex: 1; }
-    .small { font-size: .82rem; color: var(--muted); }
+    .small { font-size: .82rem; color: var(--muted); line-height: 1.65; }
+    .micro { font-size: .75rem; color: rgba(217,228,255,.78); }
     .chord-buttons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
     .chord-buttons button { padding: 10px 8px; border-radius: 14px; }
 
-    .sequence { display: grid; gap: 10px; min-height: 220px; }
+    .sequence { display: grid; gap: 10px; min-height: 236px; }
     .chord-item {
       display: grid;
-      grid-template-columns: auto 1fr auto auto auto;
+      grid-template-columns: auto 1fr auto auto auto auto;
       gap: 10px;
       align-items: center;
       padding: 12px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.25);
+      border-radius: 20px;
+      background: rgba(0,0,0,.28);
       border: 1px solid var(--border);
     }
-    .chord-name { font-size: 1.2rem; font-weight: 900; letter-spacing: -.03em; }
-    .pill { color: var(--muted); font-size: .82rem; border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px; }
-    .active { outline: 2px solid var(--accent); background: rgba(156,236,255,.12); }
-    .transport { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .export { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .keyboard { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; height: 70px; margin-top: 16px; }
-    .key { border-radius: 0 0 10px 10px; background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.45); position: relative; }
-    .key.black { background: #111827; height: 45px; margin-inline: -12px; z-index: 2; border-color: rgba(0,0,0,.8); }
-    .key.on { background: var(--accent); box-shadow: 0 0 22px rgba(156,236,255,.55); }
-    .empty { color: var(--muted); border: 1px dashed var(--border); border-radius: 18px; padding: 28px; text-align: center; }
+    .chord-index { color: var(--accent); font-size: .82rem; font-weight: 950; min-width: 30px; }
+    .chord-name { font-size: 1.28rem; font-weight: 950; letter-spacing: -.04em; }
+    .pill { color: var(--muted); font-size: .82rem; border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px; display: inline-flex; gap: 6px; align-items: center; width: fit-content; }
+    .active { outline: 2px solid var(--accent); background: rgba(124,232,255,.13); }
 
-    @media (max-width: 900px) {
-      header { display: block; }
-      .status { display: inline-block; margin-top: 16px; }
-      .grid { grid-template-columns: 1fr; }
-      .transport, .export { grid-template-columns: 1fr 1fr; }
-      .chord-item { grid-template-columns: 1fr auto auto; }
-      .chord-item .pill { grid-column: 1 / -1; }
+    .transport { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .export { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .control-strip {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .toggle-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(0,0,0,.24);
+      color: var(--soft);
+      font-weight: 850;
+    }
+
+    .keyboard-wrap { margin-top: 16px; border-radius: 24px; padding: 12px; background: rgba(0,0,0,.24); border: 1px solid var(--border); }
+    .keyboard { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; height: 82px; }
+    .key { border-radius: 0 0 12px 12px; background: linear-gradient(180deg, #ffffff, #cbd5e1); border: 1px solid rgba(255,255,255,.45); position: relative; box-shadow: inset 0 -8px 12px rgba(0,0,0,.13); }
+    .key.black { background: linear-gradient(180deg, #202638, #03050b); height: 52px; margin-inline: -13px; z-index: 2; border-color: rgba(0,0,0,.8); }
+    .key.on { background: var(--accent); box-shadow: 0 0 28px rgba(124,232,255,.68), inset 0 -8px 12px rgba(0,0,0,.13); }
+    .key.black.on { background: linear-gradient(180deg, var(--accent-3), #27213c); }
+    .empty { color: var(--muted); border: 1px dashed var(--border); border-radius: 22px; padding: 32px; text-align: center; background: rgba(0,0,0,.14); }
+
+    .chord-book-tools { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 12px; }
+    .chord-book { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 9px; max-height: 420px; overflow: auto; padding-right: 4px; }
+    .book-card {
+      text-align: left;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.26);
+      border: 1px solid var(--border);
+    }
+    .book-card strong { display: block; font-size: 1.1rem; letter-spacing: -.03em; }
+    .book-card small { color: var(--muted); display: block; margin-top: 4px; }
+    .book-card:hover { background: rgba(124,232,255,.11); }
+
+    .meter {
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.11);
+      margin-top: 14px;
+    }
+    .meter > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .12s linear; }
+
+    @media (max-width: 1040px) {
+      header { grid-template-columns: 1fr; }
+      .top-badges { justify-content: flex-start; }
+      .grid, .wide-grid { grid-template-columns: 1fr; }
+      .transport, .control-strip { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 650px) {
+      .form-grid, .export, .transport, .control-strip { grid-template-columns: 1fr; }
+      .chord-buttons { grid-template-columns: 1fr 1fr; }
+      .chord-item { grid-template-columns: auto 1fr auto auto; }
+      .chord-item .pill { grid-column: 2 / -1; }
+      .hide-mobile { display: none; }
     }
   </style>
 </head>
@@ -113,15 +212,19 @@
   <header>
     <div>
       <h1>Chord Sequence<br>Studio</h1>
-      <p class="lead">ブラウザだけでコード進行を組み、Web Audioでプレビューし、MIDI / WAVとして書き出せるミニ作曲ツール。</p>
+      <p class="lead">コード帳から選ぶ、進行を組む、ピアノ風音源で鳴らす。ブラウザだけでMIDI / WAVまで書き出せるコード進行スケッチャー。</p>
     </div>
-    <div class="status" id="status">Ready</div>
+    <div class="top-badges">
+      <div class="badge">Piano Engine</div>
+      <div class="badge">Loop Ready</div>
+      <div class="status" id="status">Ready</div>
+    </div>
   </header>
 
   <main>
     <section class="grid">
       <div class="card">
-        <h2>コードを追加</h2>
+        <h2><span>01</span> コードを追加</h2>
         <div class="form-grid">
           <label>Root
             <select id="root"></select>
@@ -138,64 +241,93 @@
         </div>
         <div class="row" style="margin-top:12px">
           <button class="primary" id="addChord">Add chord</button>
-          <button id="previewChord">Preview chord</button>
+          <button id="previewChord">Preview</button>
         </div>
         <p class="small">よく使う進行</p>
         <div class="chord-buttons" id="presets"></div>
       </div>
 
       <div class="card">
-        <h2>シーケンス</h2>
+        <h2><span>02</span> シーケンス</h2>
         <div class="sequence" id="sequence"></div>
+        <div class="meter"><div id="progress"></div></div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>再生・書き出し</h2>
-      <div class="form-grid">
-        <label>BPM <input id="bpm" type="number" min="30" max="240" value="100" /></label>
-        <label>Waveform
-          <select id="waveform">
-            <option>sine</option><option>triangle</option><option selected>sawtooth</option><option>square</option>
-          </select>
-        </label>
-        <label>Attack <input id="attack" type="range" min="0" max="0.4" step="0.01" value="0.03" /></label>
-        <label>Release <input id="release" type="range" min="0.02" max="1.5" step="0.01" value="0.35" /></label>
+    <section class="wide-grid">
+      <div class="card">
+        <h2><span>03</span> 再生・書き出し</h2>
+        <div class="form-grid">
+          <label>BPM <input id="bpm" type="number" min="30" max="240" value="100" /></label>
+          <label>Instrument
+            <select id="instrument">
+              <option value="piano" selected>Piano / browser synth</option>
+              <option value="warm">Warm Pad</option>
+              <option value="sine">Sine</option>
+              <option value="triangle">Triangle</option>
+              <option value="sawtooth">Sawtooth</option>
+              <option value="square">Square</option>
+            </select>
+          </label>
+          <label>Attack <input id="attack" type="range" min="0" max="0.45" step="0.01" value="0.01" /></label>
+          <label>Release <input id="release" type="range" min="0.03" max="2.4" step="0.01" value="0.82" /></label>
+        </div>
+        <div class="control-strip">
+          <label class="toggle-line">Loop <input id="loop" type="checkbox" /></label>
+          <label>Velocity <input id="velocity" type="range" min="0.2" max="1" step="0.01" value="0.76" /></label>
+          <label>Humanize <input id="humanize" type="range" min="0" max="0.04" step="0.002" value="0.008" /></label>
+          <label>Reverb <input id="reverb" type="range" min="0" max="0.55" step="0.01" value="0.18" /></label>
+        </div>
+        <div class="transport" style="margin-top:14px">
+          <button class="primary" id="play">Play</button>
+          <button class="secondary" id="loopPlay">Loop Play</button>
+          <button id="stop">Stop</button>
+          <button id="saveProject">Save JSON</button>
+          <button class="danger" id="clear">Clear</button>
+        </div>
+        <div class="export" style="margin-top:10px">
+          <button id="exportMidi">Export MIDI</button>
+          <button id="exportWav">Export WAV</button>
+          <label style="display:block"><input id="loadProject" type="file" accept="application/json" style="width:100%" /></label>
+        </div>
+        <div class="keyboard-wrap"><div class="keyboard" id="keyboard"></div></div>
+        <p class="micro">Piano音源はサンプル未使用の軽量シンセです。複数倍音、短いアタック、指数減衰、軽いディチューンでピアノっぽくしています。</p>
       </div>
-      <div class="transport" style="margin-top:14px">
-        <button class="primary" id="play">Play sequence</button>
-        <button id="stop">Stop</button>
-        <button id="saveProject">Save JSON</button>
-        <button class="danger" id="clear">Clear</button>
+
+      <div class="card">
+        <h2><span>04</span> コード帳</h2>
+        <div class="chord-book-tools">
+          <input id="bookSearch" placeholder="例: Cmaj7, minor, 7..." />
+          <button id="bookPreviewMode" class="mini">Preview</button>
+        </div>
+        <p class="small">クリックでプレビュー、Alt/Option + クリックで即追加。PreviewボタンをAddに切り替えると通常クリックで追加。</p>
+        <div class="chord-book" id="chordBook"></div>
       </div>
-      <div class="export" style="margin-top:10px">
-        <button id="exportMidi">Export MIDI</button>
-        <button id="exportWav">Export WAV</button>
-        <label style="display:block"><input id="loadProject" type="file" accept="application/json" style="width:100%" /></label>
-      </div>
-      <div class="keyboard" id="keyboard"></div>
     </section>
   </main>
 
   <script>
     const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-    const QUALITIES = {
-      'major': [0, 4, 7],
-      'minor': [0, 3, 7],
-      'dim': [0, 3, 6],
-      'aug': [0, 4, 8],
-      'sus2': [0, 2, 7],
-      'sus4': [0, 5, 7],
-      'maj7': [0, 4, 7, 11],
-      'm7': [0, 3, 7, 10],
-      '7': [0, 4, 7, 10],
-      'mMaj7': [0, 3, 7, 11],
-      'add9': [0, 4, 7, 14],
-      'madd9': [0, 3, 7, 14],
-      '6': [0, 4, 7, 9],
-      'm6': [0, 3, 7, 9],
-      '9': [0, 4, 7, 10, 14]
+    const QUALITY_INFO = {
+      'major': { intervals: [0, 4, 7], label: '', desc: '明るい基本形' },
+      'minor': { intervals: [0, 3, 7], label: 'm', desc: '暗い基本形' },
+      'dim': { intervals: [0, 3, 6], label: 'dim', desc: '不安定・緊張' },
+      'aug': { intervals: [0, 4, 8], label: 'aug', desc: '浮遊・不思議' },
+      'sus2': { intervals: [0, 2, 7], label: 'sus2', desc: '透明感' },
+      'sus4': { intervals: [0, 5, 7], label: 'sus4', desc: '解決感' },
+      'maj7': { intervals: [0, 4, 7, 11], label: 'maj7', desc: '都会的・柔らかい' },
+      'm7': { intervals: [0, 3, 7, 10], label: 'm7', desc: '落ち着いた暗さ' },
+      '7': { intervals: [0, 4, 7, 10], label: '7', desc: '次へ進みたい' },
+      'mMaj7': { intervals: [0, 3, 7, 11], label: 'mMaj7', desc: '映画的・怪しい' },
+      'add9': { intervals: [0, 4, 7, 14], label: 'add9', desc: '爽やか' },
+      'madd9': { intervals: [0, 3, 7, 14], label: 'madd9', desc: '切ない' },
+      '6': { intervals: [0, 4, 7, 9], label: '6', desc: 'レトロ' },
+      'm6': { intervals: [0, 3, 7, 9], label: 'm6', desc: 'ジャズ感' },
+      '9': { intervals: [0, 4, 7, 10, 14], label: '9', desc: 'ファンク/ジャズ' },
+      'maj9': { intervals: [0, 4, 7, 11, 14], label: 'maj9', desc: '深い浮遊感' },
+      'm9': { intervals: [0, 3, 7, 10, 14], label: 'm9', desc: 'lo-fi感' }
     };
+    const QUALITIES = Object.fromEntries(Object.entries(QUALITY_INFO).map(([k, v]) => [k, v.intervals]));
     const PRESETS = [
       ['王道', ['C major','G major','A minor','F major']],
       ['小室', ['A minor','F major','G major','C major']],
@@ -207,7 +339,10 @@
       ['Reset', []]
     ];
 
-    const state = { sequence: [], audio: null, playingNodes: [], activeIndex: -1, timers: [] };
+    const state = {
+      sequence: [], audio: null, playingNodes: [], activeIndex: -1,
+      timers: [], loopTimer: null, isPlaying: false, bookMode: 'preview', progressTimer: null, startedAt: 0, passDuration: 0
+    };
     const $ = id => document.getElementById(id);
 
     function init() {
@@ -223,15 +358,19 @@
       });
       $('addChord').onclick = addChordFromForm;
       $('previewChord').onclick = () => previewChord(currentChordFromForm());
-      $('play').onclick = playSequence;
+      $('play').onclick = () => { $('loop').checked = false; playSequence(); };
+      $('loopPlay').onclick = () => { $('loop').checked = true; playSequence(); };
       $('stop').onclick = stopAll;
-      $('clear').onclick = () => { state.sequence = []; render(); };
+      $('clear').onclick = () => { stopAll(false); state.sequence = []; render(); setStatus('Cleared'); };
       $('exportMidi').onclick = exportMidi;
       $('exportWav').onclick = exportWav;
       $('saveProject').onclick = saveProject;
       $('loadProject').onchange = loadProject;
+      $('bookSearch').oninput = renderChordBook;
+      $('bookPreviewMode').onclick = toggleBookMode;
       renderKeyboard([]);
       render();
+      renderChordBook();
     }
 
     function currentChordFromForm() {
@@ -239,8 +378,7 @@
     }
 
     function chordLabel(chord) {
-      const suffix = chord.quality === 'major' ? '' : chord.quality === 'minor' ? 'm' : chord.quality;
-      return `${chord.root}${suffix}`;
+      return `${chord.root}${QUALITY_INFO[chord.quality]?.label ?? chord.quality}`;
     }
 
     function midiRoot(root, octave) {
@@ -256,16 +394,19 @@
     function addChordFromForm() {
       state.sequence.push(currentChordFromForm());
       render();
+      setStatus('Chord added');
     }
 
     function applyPreset(chords) {
-      if (!chords.length) { state.sequence = []; render(); return; }
+      stopAll(false);
+      if (!chords.length) { state.sequence = []; render(); setStatus('Preset reset'); return; }
       state.sequence = chords.map(text => {
         const [root, qualityRaw] = text.split(' ');
         const quality = qualityRaw === 'm' ? 'minor' : qualityRaw;
         return { root, quality, octave: 4, bars: 1 };
       });
       render();
+      setStatus('Preset loaded');
     }
 
     function render() {
@@ -274,24 +415,26 @@
       if (!state.sequence.length) {
         const empty = document.createElement('div');
         empty.className = 'empty';
-        empty.textContent = 'まだコードがありません。左から追加、またはプリセットを選択。';
+        empty.textContent = 'まだコードがありません。左から追加、またはコード帳・プリセットを選択。';
         seq.append(empty);
+        $('progress').style.width = '0%';
         return;
       }
       state.sequence.forEach((chord, i) => {
         const item = document.createElement('div');
         item.className = 'chord-item' + (i === state.activeIndex ? ' active' : '');
-        item.innerHTML = `<div class="chord-name">${chordLabel(chord)}</div><div class="pill">${chord.bars} bar / octave ${chord.octave}</div>`;
+        item.innerHTML = `<div class="chord-index">${String(i + 1).padStart(2, '0')}</div><div><div class="chord-name">${chordLabel(chord)}</div><div class="pill">${chord.bars} bar / octave ${chord.octave}</div></div>`;
+        const play = button('▶', () => previewChord(chord));
         const up = button('↑', () => move(i, -1));
         const down = button('↓', () => move(i, 1));
         const del = button('×', () => { state.sequence.splice(i,1); render(); });
-        item.append(up, down, del);
+        item.append(play, up, down, del);
         item.onclick = e => { if (e.target.tagName !== 'BUTTON') previewChord(chord); };
         seq.append(item);
       });
     }
 
-    function button(text, fn) { const b = document.createElement('button'); b.textContent = text; b.onclick = fn; return b; }
+    function button(text, fn) { const b = document.createElement('button'); b.className = 'mini'; b.textContent = text; b.onclick = fn; return b; }
     function move(i, delta) {
       const j = i + delta;
       if (j < 0 || j >= state.sequence.length) return;
@@ -299,63 +442,223 @@
       render();
     }
 
+    function renderChordBook() {
+      const query = $('bookSearch').value.trim().toLowerCase();
+      const book = $('chordBook');
+      book.innerHTML = '';
+      const chords = [];
+      NOTE_NAMES.forEach(root => {
+        Object.keys(QUALITIES).forEach(quality => {
+          const chord = { root, quality, octave: Number($('octave').value || 4), bars: Number($('bars').value || 1) };
+          const label = chordLabel(chord);
+          const haystack = `${label} ${root} ${quality} ${QUALITY_INFO[quality].desc}`.toLowerCase();
+          if (!query || haystack.includes(query)) chords.push(chord);
+        });
+      });
+      chords.forEach(chord => {
+        const card = document.createElement('button');
+        card.className = 'book-card';
+        card.innerHTML = `<strong>${chordLabel(chord)}</strong><small>${QUALITY_INFO[chord.quality].desc}</small>`;
+        card.onclick = e => {
+          if (state.bookMode === 'add' || e.altKey) {
+            state.sequence.push(chord);
+            render();
+            setStatus(`${chordLabel(chord)} added`);
+          } else {
+            previewChord(chord);
+          }
+        };
+        book.append(card);
+      });
+    }
+
+    function toggleBookMode() {
+      state.bookMode = state.bookMode === 'preview' ? 'add' : 'preview';
+      $('bookPreviewMode').textContent = state.bookMode === 'preview' ? 'Preview' : 'Add';
+      $('bookPreviewMode').classList.toggle('primary', state.bookMode === 'add');
+      setStatus(`Chord book: ${state.bookMode}`);
+    }
+
     function ensureAudio() {
       if (!state.audio) state.audio = new (window.AudioContext || window.webkitAudioContext)();
       return state.audio;
     }
 
+    function createImpulse(ctx, seconds = 1.6, decay = 2.4) {
+      const length = Math.floor(ctx.sampleRate * seconds);
+      const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const data = impulse.getChannelData(ch);
+        for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+      return impulse;
+    }
+
+    function makeOutput(ctx, destination) {
+      const wetAmount = Number($('reverb').value || 0);
+      const dry = ctx.createGain();
+      dry.gain.value = 1 - wetAmount * .45;
+      if (wetAmount > 0.01 && ctx.createConvolver) {
+        const convolver = ctx.createConvolver();
+        convolver.buffer = createImpulse(ctx);
+        const wet = ctx.createGain();
+        wet.gain.value = wetAmount;
+        dry.connect(destination);
+        dry.connect(convolver);
+        convolver.connect(wet);
+        wet.connect(destination);
+      } else {
+        dry.connect(destination);
+      }
+      return dry;
+    }
+
     function scheduleChord(ctx, chord, start, duration, destination = ctx.destination) {
-      const attack = Number($('attack').value);
-      const release = Number($('release').value);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.18, start + Math.max(0.005, attack));
-      gain.gain.setValueAtTime(0.18, Math.max(start, start + duration - release));
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-      gain.connect(destination);
-      const nodes = chordMidiNotes(chord).map(note => {
-        const osc = ctx.createOscillator();
-        osc.type = $('waveform').value;
-        osc.frequency.value = midiToFreq(note);
-        osc.connect(gain);
-        osc.start(start);
-        osc.stop(start + duration + 0.05);
-        return osc;
+      const out = makeOutput(ctx, destination);
+      const notes = chordMidiNotes(chord);
+      const nodes = [];
+      notes.forEach((note, idx) => {
+        const jitter = Number($('humanize').value || 0) * (idx / Math.max(1, notes.length - 1));
+        nodes.push(...scheduleNote(ctx, note, start + jitter, duration, out));
       });
       return nodes;
+    }
+
+    function scheduleNote(ctx, midi, start, duration, destination) {
+      const instrument = $('instrument').value;
+      if (instrument === 'piano') return schedulePianoNote(ctx, midi, start, duration, destination);
+      if (instrument === 'warm') return scheduleWarmNote(ctx, midi, start, duration, destination);
+      return scheduleSimpleNote(ctx, midi, start, duration, destination, instrument);
+    }
+
+    function schedulePianoNote(ctx, midi, start, duration, destination) {
+      const velocity = Number($('velocity').value || .76);
+      const release = Number($('release').value || .82);
+      const attack = Math.max(.003, Number($('attack').value || .01));
+      const freq = midiToFreq(midi);
+      const partials = [
+        [1, 1.0, 0], [2, .46, 4], [3, .24, -3], [4, .12, 7], [5, .065, -8]
+      ];
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, start);
+      master.gain.exponentialRampToValueAtTime(0.19 * velocity, start + attack);
+      master.gain.exponentialRampToValueAtTime(0.055 * velocity, start + Math.min(duration * .55, 1.2));
+      master.gain.setValueAtTime(0.045 * velocity, Math.max(start + attack, start + duration - release));
+      master.gain.exponentialRampToValueAtTime(0.0001, start + duration + release);
+      master.connect(destination);
+      const nodes = [];
+      partials.forEach(([mul, amp, cents]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = mul === 1 ? 'triangle' : 'sine';
+        osc.frequency.value = freq * mul * Math.pow(2, cents / 1200);
+        gain.gain.value = amp;
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(start);
+        osc.stop(start + duration + release + .08);
+        nodes.push(osc);
+      });
+      return nodes;
+    }
+
+    function scheduleWarmNote(ctx, midi, start, duration, destination) {
+      return scheduleSimpleNote(ctx, midi, start, duration + .3, destination, 'triangle', .12, .9);
+    }
+
+    function scheduleSimpleNote(ctx, midi, start, duration, destination, type = 'sawtooth', level = .15, relOverride = null) {
+      const attack = Number($('attack').value || .03);
+      const release = relOverride ?? Number($('release').value || .35);
+      const velocity = Number($('velocity').value || .76);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(level * velocity, start + Math.max(0.005, attack));
+      gain.gain.setValueAtTime(level * velocity, Math.max(start, start + duration - release));
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration + release);
+      gain.connect(destination);
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = midiToFreq(midi);
+      osc.connect(gain);
+      osc.start(start);
+      osc.stop(start + duration + release + .05);
+      return [osc];
     }
 
     function previewChord(chord) {
       const ctx = ensureAudio();
       stopAll(false);
-      state.playingNodes.push(...scheduleChord(ctx, chord, ctx.currentTime + 0.02, 1.8));
+      state.playingNodes.push(...scheduleChord(ctx, chord, ctx.currentTime + 0.02, 1.45));
       renderKeyboard(chordMidiNotes(chord));
       setStatus(`Preview: ${chordLabel(chord)}`);
       window.setTimeout(() => renderKeyboard([]), 1900);
     }
 
+    function sequenceDurationSeconds() {
+      const beat = 60 / Number($('bpm').value || 100);
+      return state.sequence.reduce((sum, c) => sum + c.bars * 4 * beat, 0);
+    }
+
     function playSequence() {
       if (!state.sequence.length) return setStatus('Add chords first');
-      const ctx = ensureAudio();
       stopAll(false);
+      state.isPlaying = true;
+      scheduleSequencePass();
+    }
+
+    function scheduleSequencePass() {
+      if (!state.isPlaying) return;
+      const ctx = ensureAudio();
       const beat = 60 / Number($('bpm').value || 100);
       let t = ctx.currentTime + 0.08;
+      state.startedAt = t;
+      state.passDuration = sequenceDurationSeconds();
+      startProgressLoop(ctx);
       state.sequence.forEach((chord, i) => {
         const dur = chord.bars * 4 * beat;
         state.playingNodes.push(...scheduleChord(ctx, chord, t, dur));
-        state.timers.push(setTimeout(() => { state.activeIndex = i; render(); renderKeyboard(chordMidiNotes(chord)); }, (t - ctx.currentTime) * 1000));
+        state.timers.push(setTimeout(() => { state.activeIndex = i; render(); renderKeyboard(chordMidiNotes(chord)); }, Math.max(0, (t - ctx.currentTime) * 1000)));
         t += dur;
       });
-      state.timers.push(setTimeout(() => { state.activeIndex = -1; render(); renderKeyboard([]); setStatus('Ready'); }, (t - ctx.currentTime) * 1000));
-      setStatus('Playing');
+      const endMs = Math.max(0, (t - ctx.currentTime) * 1000);
+      state.timers.push(setTimeout(() => {
+        state.activeIndex = -1;
+        render();
+        renderKeyboard([]);
+        if ($('loop').checked && state.isPlaying) {
+          setStatus('Looping');
+          state.loopTimer = setTimeout(scheduleSequencePass, 120);
+        } else {
+          state.isPlaying = false;
+          setStatus('Ready');
+          $('progress').style.width = '0%';
+          clearInterval(state.progressTimer);
+        }
+      }, endMs));
+      setStatus($('loop').checked ? 'Loop playing' : 'Playing');
+    }
+
+    function startProgressLoop(ctx) {
+      clearInterval(state.progressTimer);
+      state.progressTimer = setInterval(() => {
+        if (!state.isPlaying || !state.passDuration) return;
+        const elapsed = Math.max(0, ctx.currentTime - state.startedAt);
+        const pct = Math.min(100, (elapsed / state.passDuration) * 100);
+        $('progress').style.width = `${pct}%`;
+      }, 80);
     }
 
     function stopAll(updateStatus = true) {
+      state.isPlaying = false;
       state.playingNodes.forEach(n => { try { n.stop(); } catch {} });
       state.playingNodes = [];
       state.timers.forEach(clearTimeout);
       state.timers = [];
+      clearTimeout(state.loopTimer);
+      clearInterval(state.progressTimer);
+      state.loopTimer = null;
       state.activeIndex = -1;
+      $('progress').style.width = '0%';
       renderKeyboard([]);
       render();
       if (updateStatus) setStatus('Stopped');
@@ -396,7 +699,7 @@
       events.forEach(e => {
         pushVar(track, e.tick - last);
         last = e.tick;
-        track.push(e.type === 'on' ? 0x90 : 0x80, e.note, e.type === 'on' ? 86 : 0);
+        track.push(e.type === 'on' ? 0x90 : 0x80, e.note, e.type === 'on' ? Math.round(105 * Number($('velocity').value || .76)) : 0);
       });
       pushVar(track, 0); track.push(0xff, 0x2f, 0x00);
       const bytes = [...ascii('MThd'), 0,0,0,6, 0,0, 0,1, (ppq>>8)&255, ppq&255, ...ascii('MTrk'), ...u32(track.length), ...track];
@@ -417,13 +720,13 @@
       setStatus('Rendering WAV...');
       const bpm = Number($('bpm').value || 100);
       const beat = 60 / bpm;
-      const duration = state.sequence.reduce((sum, c) => sum + c.bars * 4 * beat, 0) + 0.8;
+      const duration = sequenceDurationSeconds() + 2.2;
       const sampleRate = 44100;
       const ctx = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
       const master = ctx.createGain();
-      master.gain.value = 0.72;
+      master.gain.value = 0.82;
       master.connect(ctx.destination);
-      let t = 0.05;
+      let t = 0.06;
       state.sequence.forEach(chord => {
         const dur = chord.bars * 4 * beat;
         scheduleOfflineChord(ctx, chord, t, dur, master);
@@ -435,22 +738,18 @@
     }
 
     function scheduleOfflineChord(ctx, chord, start, duration, destination) {
-      const attack = Number($('attack').value);
-      const release = Number($('release').value);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.18, start + Math.max(0.005, attack));
-      gain.gain.setValueAtTime(0.18, Math.max(start, start + duration - release));
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-      gain.connect(destination);
-      chordMidiNotes(chord).forEach(note => {
-        const osc = ctx.createOscillator();
-        osc.type = $('waveform').value;
-        osc.frequency.value = midiToFreq(note);
-        osc.connect(gain);
-        osc.start(start);
-        osc.stop(start + duration + 0.05);
+      const notes = chordMidiNotes(chord);
+      notes.forEach((note, idx) => {
+        const jitter = Number($('humanize').value || 0) * (idx / Math.max(1, notes.length - 1));
+        scheduleOfflineNote(ctx, note, start + jitter, duration, destination);
       });
+    }
+
+    function scheduleOfflineNote(ctx, midi, start, duration, destination) {
+      const instrument = $('instrument').value;
+      if (instrument === 'piano') return schedulePianoNote(ctx, midi, start, duration, destination);
+      if (instrument === 'warm') return scheduleWarmNote(ctx, midi, start, duration, destination);
+      return scheduleSimpleNote(ctx, midi, start, duration, destination, instrument);
     }
 
     function audioBufferToWav(buffer) {
@@ -475,7 +774,19 @@
     }
 
     function saveProject() {
-      download(new Blob([JSON.stringify({ version: 1, bpm: $('bpm').value, waveform: $('waveform').value, sequence: state.sequence }, null, 2)], { type: 'application/json' }), 'chord-sequence.json');
+      download(new Blob([JSON.stringify({
+        version: 2,
+        bpm: $('bpm').value,
+        instrument: $('instrument').value,
+        loop: $('loop').checked,
+        attack: $('attack').value,
+        release: $('release').value,
+        velocity: $('velocity').value,
+        humanize: $('humanize').value,
+        reverb: $('reverb').value,
+        sequence: state.sequence
+      }, null, 2)], { type: 'application/json' }), 'chord-sequence.json');
+      setStatus('Project saved');
     }
 
     async function loadProject(e) {
@@ -483,9 +794,12 @@
       if (!file) return;
       const data = JSON.parse(await file.text());
       if (data.bpm) $('bpm').value = data.bpm;
-      if (data.waveform) $('waveform').value = data.waveform;
+      if (data.instrument) $('instrument').value = data.instrument;
+      if (typeof data.loop === 'boolean') $('loop').checked = data.loop;
+      ['attack','release','velocity','humanize','reverb'].forEach(id => { if (data[id] !== undefined) $(id).value = data[id]; });
       if (Array.isArray(data.sequence)) state.sequence = data.sequence;
       render();
+      renderChordBook();
       setStatus('Project loaded');
     }
 
