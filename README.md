@@ -1,6 +1,6 @@
 # Chord Sequence Studio
 
-ブラウザ上でコードを選び、コードシーケンスを作成し、ピアノ風音源でプレビュー再生し、MIDI/WAVを書き出せる静的Webアプリです。
+ブラウザ上でコードを選び、コードシーケンスを作成し、ピアノ風音源やSF2 SoundFontでプレビュー再生し、MIDI/WAVを書き出せる静的Webアプリです。
 
 ## Features
 
@@ -9,6 +9,7 @@
 - コード帳からコードを検索・プレビュー・追加
 - Web Audio APIによるコードプレビュー再生
 - ピアノ風ブラウザシンセ音源
+- SF2 SoundFontファイルのローカル読み込み
 - Warm Pad / Sine / Triangle / Sawtooth / Square 音色
 - ループ再生
 - Velocity / Humanize / Reverb / Attack / Release 調整
@@ -39,7 +40,27 @@
 - Lo-fi
 - EDM
 
-Cloudflare Pagesでは `_worker.js` により、既存の単一HTMLを保ったままプリセットと `m7b5` コードを上書き追加します。
+Cloudflare Pagesでは `_worker.js` により、既存の単一HTMLを保ったままプリセット、`m7b5` コード、SF2読み込みUIを上書き追加します。
+
+## SF2 SoundFont Support
+
+Cloudflare Pages版では、`Instrument` から `SF2 SoundFont / uploaded` を選び、`SF2 File` で `.sf2` を読み込めます。
+
+読み込んだSF2ファイルはサーバーへアップロードされず、ブラウザ内だけで処理されます。
+
+現在の対応範囲:
+
+- SoundFont 2 / RIFF `sfbk`
+- `sdta/smpl` の16bit PCMサンプル
+- `pdta/shdr` のサンプルヘッダ
+- `originalPitch` に近いサンプルを選んでピッチ変更再生
+- プレビュー再生、シーケンス再生、WAV書き出しでSF2音色を使用
+
+制限:
+
+- SF2のプリセット/インストゥルメント/ベロシティレイヤー/ループポイント/フィルタ/エンベロープはまだ簡易対応です
+- 圧縮系SF3や特殊なSoundFontでは読み込めない場合があります
+- 大きいGM音源ではメモリ使用量が増えます
 
 ## Usage
 
