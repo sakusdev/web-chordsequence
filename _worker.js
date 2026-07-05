@@ -14,7 +14,8 @@ export default {
       '<script src="/features.js?v=20260705-advanced-1"></script>',
       '<script src="/features-extra.js?v=20260705-extra-1"></script>',
       '<script src="/features-ui.js?v=20260705-ui-1"></script>',
-      '<script src="/presets-audit.js?v=20260705-audit-1"></script>'
+      '<script src="/presets-audit.js?v=20260705-audit-1"></script>',
+      '<script src="/sf2-presets.js?v=20260705-sf2-preset-1"></script>'
     ].filter(script => !html.includes(script.match(/src="([^"]+)/)?.[1] || ''));
 
     if (scripts.length) html = html.replace('</body>', `${scripts.join('\n')}\n</body>`);
