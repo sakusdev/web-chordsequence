@@ -2,44 +2,133 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chord Book - Chord Sequence Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#080b13" />
+  <title>コード帳 | Chord Sequence Studio</title>
   <style>
-    :root{color-scheme:dark;--text:#f8fbff;--muted:#aab5ca;--accent:#7ce8ff;--accent2:#d7ff75;--border:rgba(255,255,255,.15);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(circle at 10% 10%,rgba(124,232,255,.2),transparent 28rem),radial-gradient(circle at 90% 5%,rgba(215,255,117,.14),transparent 24rem),linear-gradient(135deg,#05060b,#101522 50%,#070811)}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px}header,main{position:relative;max-width:1180px;margin:auto;padding:28px clamp(18px,4vw,52px)}h1{margin:0;font-size:clamp(2.2rem,8vw,5.8rem);letter-spacing:-.075em;line-height:.88}.lead{color:var(--muted);line-height:1.8;max-width:760px}.top{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}a,button,input,select{font:inherit}a.btn,button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.08);color:var(--text);padding:12px 14px;font-weight:900}a.btn.primary,button.primary{background:linear-gradient(135deg,rgba(124,232,255,.28),rgba(215,255,117,.2));border-color:rgba(124,232,255,.55)}input,select{width:100%;border:1px solid var(--border);border-radius:16px;background:rgba(0,0,0,.32);color:var(--text);padding:12px 13px;outline:none}.panel{background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055));border:1px solid var(--border);border-radius:30px;padding:20px;box-shadow:0 28px 100px rgba(0,0,0,.42);backdrop-filter:blur(20px)}.tools{display:grid;grid-template-columns:1fr 160px 130px;gap:12px;margin-bottom:16px}.book{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px}.card{padding:14px;border:1px solid var(--border);border-radius:20px;background:rgba(0,0,0,.24)}.card strong{display:block;font-size:1.22rem;letter-spacing:-.04em}.card small{display:block;color:var(--muted);margin-top:5px;min-height:2.6em}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:12px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(8,12,22,.88);backdrop-filter:blur(16px);opacity:0;transition:.2s}.toast.show{opacity:1}@media(max-width:700px){.tools{grid-template-columns:1fr}.book{grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr}}
+    :root{
+      color-scheme:dark;
+      --bg:#080b13;--surface:rgba(15,20,34,.84);--surface2:rgba(255,255,255,.055);
+      --text:#f8fbff;--muted:#aab5ca;--accent:#7ce8ff;--accent2:#d7ff75;
+      --border:rgba(255,255,255,.12);--danger:#ff8ba5;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(circle at 8% 0,rgba(124,232,255,.15),transparent 30rem),radial-gradient(circle at 92% 2%,rgba(198,155,255,.12),transparent 28rem),var(--bg)}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.1;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:54px 54px}
+    button,input,select,a{font:inherit}
+    button,input,select,.btn{min-height:46px;border:1px solid var(--border);border-radius:14px;background:rgba(4,7,14,.68);color:var(--text);padding:11px 13px;outline:none}
+    button,.btn{cursor:pointer;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;touch-action:manipulation}
+    button:hover,.btn:hover{background:rgba(255,255,255,.1)}
+    button:focus-visible,input:focus-visible,select:focus-visible,.btn:focus-visible{outline:3px solid rgba(124,232,255,.45);outline-offset:2px}
+    .primary{background:linear-gradient(135deg,rgba(124,232,255,.27),rgba(215,255,117,.17));border-color:rgba(124,232,255,.42)}
+    header,main{position:relative;max-width:1380px;margin:auto;padding-inline:clamp(12px,3vw,38px)}
+    header{padding-top:16px;padding-bottom:12px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 15px;border:1px solid var(--border);border-radius:20px;background:rgba(8,12,22,.78);backdrop-filter:blur(18px);box-shadow:0 18px 52px rgba(0,0,0,.34)}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(124,232,255,.3),rgba(198,155,255,.25));border:1px solid rgba(124,232,255,.35);font-weight:1000}.brand strong{display:block;letter-spacing:-.035em}.brand span{display:block;color:var(--muted);font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    main{padding-bottom:54px}
+    .intro{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:24px 4px 16px}.intro h1{margin:0;font-size:clamp(1.85rem,5vw,3.6rem);letter-spacing:-.06em;line-height:.95}.intro p{margin:8px 0 0;color:var(--muted);max-width:680px;line-height:1.65;font-size:.9rem}.count{color:var(--muted);font-size:.82rem;white-space:nowrap}
+    .panel{border:1px solid var(--border);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));box-shadow:0 18px 52px rgba(0,0,0,.34);backdrop-filter:blur(18px);overflow:hidden}
+    .tools-wrap{position:sticky;top:8px;z-index:20;padding:14px;border-bottom:1px solid var(--border);background:rgba(10,14,25,.92);backdrop-filter:blur(18px)}
+    .tools{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(120px,.65fr));gap:9px}
+    label{display:grid;gap:6px;color:var(--muted);font-size:.74rem;font-weight:800}.search-label{grid-column:auto}.search{width:100%}
+    .book{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:14px}
+    .card{display:flex;flex-direction:column;min-height:168px;padding:14px;border:1px solid var(--border);border-radius:17px;background:rgba(2,5,11,.48)}
+    .card:hover{border-color:rgba(124,232,255,.28);background:rgba(124,232,255,.045)}
+    .card-head{display:flex;align-items:start;justify-content:space-between;gap:8px}.card strong{font-size:1.35rem;letter-spacing:-.045em}.root-tag{padding:4px 7px;border-radius:999px;background:rgba(124,232,255,.08);color:var(--accent);font-size:.68rem;font-weight:900}.card small{display:block;color:var(--muted);margin-top:7px;line-height:1.5;flex:1}.meta{margin-top:10px;color:rgba(217,228,255,.72);font-size:.7rem}.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}.actions button{min-height:42px;padding:8px 10px;font-size:.8rem}
+    .empty{grid-column:1/-1;min-height:300px;display:grid;place-items:center;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:18px;padding:30px}
+    .toast{position:fixed;left:50%;bottom:22px;z-index:80;transform:translateX(-50%) translateY(12px);padding:11px 15px;border:1px solid var(--border);border-radius:999px;background:rgba(8,12,22,.94);backdrop-filter:blur(18px);opacity:0;transition:.2s;box-shadow:0 18px 50px rgba(0,0,0,.4);font-weight:850}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-width:980px){.tools{grid-template-columns:1fr 1fr 1fr}.search-label{grid-column:1/-1}.book{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+    @media(max-width:620px){
+      header{padding:10px}.topbar{padding:11px;border-radius:17px}.brand span{display:none}.topbar .btn span{display:none}.topbar .btn{width:42px;padding:0}
+      main{padding-inline:10px;padding-bottom:30px}.intro{padding:18px 4px 12px;align-items:start;flex-direction:column;gap:8px}.intro p{font-size:.82rem}.count{white-space:normal}
+      .panel{border-radius:19px}.tools-wrap{top:0;padding:10px}.tools{grid-template-columns:1fr 1fr;gap:8px}.search-label{grid-column:1/-1}.book{grid-template-columns:1fr;padding:10px;gap:8px}.card{min-height:0}.actions{grid-template-columns:1fr 1fr}.toast{bottom:16px;max-width:calc(100vw - 24px);text-align:center}
+    }
+    @media(max-width:380px){.tools{grid-template-columns:1fr}.search-label{grid-column:auto}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
 <body>
   <header>
-    <h1>Chord Book</h1>
-    <p class="lead">コード帳を別ページ化しました。検索してプレビュー、または「使う」でメイン画面に戻ってシーケンスへ追加できます。</p>
-    <div class="top"><a class="btn primary" href="index.html">← Studioへ戻る</a></div>
+    <div class="topbar">
+      <div class="brand"><div class="mark" aria-hidden="true">CB</div><div><strong>コード帳</strong><span>検索して試聴、そのままシーケンスへ追加</span></div></div>
+      <a class="btn primary" href="index.html" aria-label="スタジオへ戻る"><b aria-hidden="true">←</b><span>スタジオへ戻る</span></a>
+    </div>
   </header>
   <main>
+    <section class="intro">
+      <div><h1>使いたいコードを、すぐ見つける。</h1><p>ルートとコードタイプを絞り込み、試聴してから「追加」を押すとスタジオへ戻ります。複数候補を比較したいときは検索欄を使えます。</p></div>
+      <div id="resultCount" class="count" aria-live="polite"></div>
+    </section>
     <section class="panel">
-      <div class="tools">
-        <input id="search" placeholder="例: Cmaj7, minor, m7b5, 9..." />
-        <select id="octave"></select>
-        <select id="bars"><option value="0.5">0.5 bar</option><option value="1" selected>1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option></select>
+      <div class="tools-wrap">
+        <div class="tools">
+          <label class="search-label">検索<input id="search" class="search" placeholder="例: Cmaj7 / minor / ジャズ" autocomplete="off" /></label>
+          <label>ルート<select id="rootFilter"></select></label>
+          <label>コードタイプ<select id="qualityFilter"></select></label>
+          <label>オクターブ<select id="octave"></select></label>
+          <label>長さ<select id="bars"><option value="0.5">0.5小節</option><option value="1" selected>1小節</option><option value="2">2小節</option><option value="4">4小節</option></select></label>
+        </div>
       </div>
       <div id="book" class="book"></div>
     </section>
   </main>
-  <div id="toast" class="toast">Ready</div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Ready</div>
   <script>
     const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-    const QUALITY_INFO={major:{intervals:[0,4,7],label:'',desc:'明るい基本形'},minor:{intervals:[0,3,7],label:'m',desc:'暗い基本形'},dim:{intervals:[0,3,6],label:'dim',desc:'不安定・緊張'},m7b5:{intervals:[0,3,6,10],label:'m7b5',desc:'半減七・ジャズ'},aug:{intervals:[0,4,8],label:'aug',desc:'浮遊・不思議'},sus2:{intervals:[0,2,7],label:'sus2',desc:'透明感'},sus4:{intervals:[0,5,7],label:'sus4',desc:'解決感'},maj7:{intervals:[0,4,7,11],label:'maj7',desc:'都会的・柔らかい'},m7:{intervals:[0,3,7,10],label:'m7',desc:'落ち着いた暗さ'},'7':{intervals:[0,4,7,10],label:'7',desc:'次へ進みたい'},mMaj7:{intervals:[0,3,7,11],label:'mMaj7',desc:'映画的・怪しい'},add9:{intervals:[0,4,7,14],label:'add9',desc:'爽やか'},madd9:{intervals:[0,3,7,14],label:'madd9',desc:'切ない'},'6':{intervals:[0,4,7,9],label:'6',desc:'レトロ'},m6:{intervals:[0,3,7,9],label:'m6',desc:'ジャズ感'},'9':{intervals:[0,4,7,10,14],label:'9',desc:'ファンク/ジャズ'},maj9:{intervals:[0,4,7,11,14],label:'maj9',desc:'深い浮遊感'},m9:{intervals:[0,3,7,10,14],label:'m9',desc:'lo-fi感'}};
-    const QUALITIES=Object.fromEntries(Object.entries(QUALITY_INFO).map(([k,v])=>[k,v.intervals]));
+    const QUALITY_INFO={major:{intervals:[0,4,7],label:'',name:'メジャー',desc:'明るい基本形'},minor:{intervals:[0,3,7],label:'m',name:'マイナー',desc:'暗い基本形'},dim:{intervals:[0,3,6],label:'dim',name:'ディミニッシュ',desc:'不安定・緊張'},m7b5:{intervals:[0,3,6,10],label:'m7b5',name:'マイナー7♭5',desc:'半減七・ジャズ'},aug:{intervals:[0,4,8],label:'aug',name:'オーギュメント',desc:'浮遊・不思議'},sus2:{intervals:[0,2,7],label:'sus2',name:'sus2',desc:'透明感'},sus4:{intervals:[0,5,7],label:'sus4',name:'sus4',desc:'解決感'},maj7:{intervals:[0,4,7,11],label:'maj7',name:'メジャー7',desc:'都会的・柔らかい'},m7:{intervals:[0,3,7,10],label:'m7',name:'マイナー7',desc:'落ち着いた暗さ'},'7':{intervals:[0,4,7,10],label:'7',name:'ドミナント7',desc:'次へ進みたい'},mMaj7:{intervals:[0,3,7,11],label:'mMaj7',name:'マイナーメジャー7',desc:'映画的・怪しい'},add9:{intervals:[0,4,7,14],label:'add9',name:'add9',desc:'爽やか'},madd9:{intervals:[0,3,7,14],label:'madd9',name:'madd9',desc:'切ない'},'6':{intervals:[0,4,7,9],label:'6',name:'6th',desc:'レトロ'},m6:{intervals:[0,3,7,9],label:'m6',name:'マイナー6',desc:'ジャズ感'},'9':{intervals:[0,4,7,10,14],label:'9',name:'9th',desc:'ファンク・ジャズ'},maj9:{intervals:[0,4,7,11,14],label:'maj9',name:'メジャー9',desc:'深い浮遊感'},m9:{intervals:[0,3,7,10,14],label:'m9',name:'マイナー9',desc:'Lo-fi感'}};
+    const QUALITIES=Object.fromEntries(Object.entries(QUALITY_INFO).map(([key,value])=>[key,value.intervals]));
     let audio;
-    function $(id){return document.getElementById(id)}
-    function label(c){return c.root+(QUALITY_INFO[c.quality]?.label??c.quality)}
-    function midiRoot(root,oct){return 12*(oct+1)+NOTE_NAMES.indexOf(root)}
-    function notes(c){return QUALITIES[c.quality].map(i=>midiRoot(c.root,c.octave)+i)}
-    function freq(m){return 440*Math.pow(2,(m-69)/12)}
-    function show(t){const el=$('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1400)}
-    function preview(c){audio=audio||new(window.AudioContext||window.webkitAudioContext)();const now=audio.currentTime+.02;notes(c).forEach((m,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=freq(m);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.13,now+.015+i*.005);g.gain.exponentialRampToValueAtTime(.0001,now+1.15);o.connect(g);g.connect(audio.destination);o.start(now);o.stop(now+1.2)});show('Preview: '+label(c))}
-    function useChord(c){localStorage.setItem('webseq:addChord',JSON.stringify(c));location.href='index.html?addChord=1'}
-    function render(){const q=$('search').value.trim().toLowerCase(),oct=Number($('octave').value),bars=Number($('bars').value),book=$('book');book.innerHTML='';NOTE_NAMES.forEach(root=>Object.keys(QUALITIES).forEach(quality=>{const c={root,quality,octave:oct,bars};const hay=(label(c)+' '+root+' '+quality+' '+QUALITY_INFO[quality].desc).toLowerCase();if(q&&!hay.includes(q))return;const card=document.createElement('div');card.className='card';card.innerHTML=`<strong>${label(c)}</strong><small>${QUALITY_INFO[quality].desc}</small>`;const actions=document.createElement('div');actions.className='actions';const p=document.createElement('button');p.textContent='Preview';p.onclick=()=>preview(c);const u=document.createElement('button');u.textContent='使う';u.className='primary';u.onclick=()=>useChord(c);actions.append(p,u);card.append(actions);book.append(card)}))}
-    for(let i=2;i<=6;i++)$('octave').append(new Option('Octave '+i,i));$('octave').value=4;$('search').oninput=render;$('octave').onchange=render;$('bars').onchange=render;render();
+    const $=id=>document.getElementById(id);
+    const chordLabel=chord=>chord.root+(QUALITY_INFO[chord.quality]?.label??chord.quality);
+    const midiRoot=(root,octave)=>12*(octave+1)+NOTE_NAMES.indexOf(root);
+    const notes=chord=>QUALITIES[chord.quality].map(interval=>midiRoot(chord.root,chord.octave)+interval);
+    const frequency=midi=>440*Math.pow(2,(midi-69)/12);
+
+    function show(text){const el=$('toast');el.textContent=text;el.classList.add('show');clearTimeout(el._timer);el._timer=setTimeout(()=>el.classList.remove('show'),1400)}
+    function preview(chord){
+      audio=audio||new(window.AudioContext||window.webkitAudioContext)();
+      const now=audio.currentTime+.02;
+      notes(chord).forEach((midi,index)=>{
+        const oscillator=audio.createOscillator(),gain=audio.createGain();
+        oscillator.type='triangle';oscillator.frequency.value=frequency(midi);
+        gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.13,now+.015+index*.005);gain.gain.exponentialRampToValueAtTime(.0001,now+1.15);
+        oscillator.connect(gain);gain.connect(audio.destination);oscillator.start(now);oscillator.stop(now+1.2);
+      });
+      show(`${chordLabel(chord)} を試聴`);
+    }
+    function useChord(chord){localStorage.setItem('webseq:addChord',JSON.stringify(chord));location.href='index.html?addChord=1'}
+    function render(){
+      const query=$('search').value.trim().toLowerCase();
+      const rootFilter=$('rootFilter').value,qualityFilter=$('qualityFilter').value;
+      const octave=Number($('octave').value),bars=Number($('bars').value),book=$('book');
+      const results=[];
+      NOTE_NAMES.forEach(root=>Object.keys(QUALITIES).forEach(quality=>{
+        if(rootFilter&&root!==rootFilter)return;if(qualityFilter&&quality!==qualityFilter)return;
+        const chord={root,quality,octave,bars},info=QUALITY_INFO[quality];
+        const hay=`${chordLabel(chord)} ${root} ${quality} ${info.name} ${info.desc}`.toLowerCase();
+        if(query&&!hay.includes(query))return;results.push(chord);
+      }));
+      book.innerHTML='';
+      $('resultCount').textContent=`${results.length}件 / 全${NOTE_NAMES.length*Object.keys(QUALITIES).length}コード`;
+      if(!results.length){book.innerHTML='<div class="empty">該当するコードがありません。<br>検索語またはフィルターを変更してください。</div>';return}
+      results.forEach(chord=>{
+        const info=QUALITY_INFO[chord.quality],card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`<div class="card-head"><strong>${chordLabel(chord)}</strong><span class="root-tag">${chord.root}</span></div><small>${info.name}<br>${info.desc}</small><div class="meta">Oct ${chord.octave} · ${chord.bars}小節</div>`;
+        const actions=document.createElement('div');actions.className='actions';
+        const previewButton=document.createElement('button');previewButton.textContent='試聴';previewButton.onclick=()=>preview(chord);
+        const useButton=document.createElement('button');useButton.textContent='追加';useButton.className='primary';useButton.onclick=()=>useChord(chord);
+        actions.append(previewButton,useButton);card.append(actions);book.append(card);
+      });
+    }
+
+    $('rootFilter').append(new Option('すべて',''));NOTE_NAMES.forEach(note=>$('rootFilter').append(new Option(note,note)));
+    $('qualityFilter').append(new Option('すべて',''));Object.entries(QUALITY_INFO).forEach(([key,info])=>$('qualityFilter').append(new Option(`${info.name} (${key})`,key)));
+    for(let octave=2;octave<=6;octave++)$('octave').append(new Option(`Octave ${octave}`,octave));$('octave').value=4;
+    ['search','rootFilter','qualityFilter','octave','bars'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+    render();
   </script>
 </body>
 </html>
