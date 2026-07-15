@@ -15,6 +15,7 @@ export default {
       '<script src="/features-extra.js?v=20260705-extra-1"></script>',
       '<script src="/features-ui.js?v=20260715-ui-2"></script>',
       '<script src="/presets-audit.js?v=20260705-audit-1"></script>',
+      '<script src="/features-chord-input.js?v=20260715-chord-input-1"></script>',
       '<script src="/sf2-presets.js?v=20260705-sf2-preset-1"></script>',
       '<script src="/sf2-force-preset-route.js?v=20260705-sf2-force-1"></script>'
     ].filter(script => !html.includes(script.match(/src="([^"]+)/)?.[1] || ''));
